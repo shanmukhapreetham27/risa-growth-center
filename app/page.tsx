@@ -59,18 +59,19 @@ export default async function OverviewPage() {
         />
         <Kpi
           testId="kpi-cash-collected"
-          title="Cash collected vs team cash goal"
+          title="Cash collected before festival vs team cash goal"
           kinds={["simulated", "assumption"]}
           value={
             <>
-              {inrCompact(s.cash_collected_inr_simulated)}{" "}
+              <span data-testid="cash-before-festival">{inrCompact(s.cash_collected_before_festival_inr_simulated)}</span>{" "}
               <span className="text-base font-normal text-muted-foreground">/ {inrCompact(data.settings.cash_goal_inr)}</span>
             </>
           }
           sub={
             <>
-              <span data-testid="cash-collected">{inr(s.cash_collected_inr_simulated)}</span> collected (simulated). Goal {inr(data.settings.cash_goal_inr)} is a team assumption. Outstanding{" "}
-              {inr(s.outstanding_confirmed_cash_inr_simulated)}; overdue {num(s.overdue_installments_simulated)} ({inr(s.overdue_amount_inr_simulated)}).
+              Before 12 Apr 10:00 IST: {inr(s.cash_collected_before_festival_inr_simulated)}. Total collected: <span data-testid="cash-collected">{inr(s.cash_collected_inr_simulated)}</span> (simulated). Goal{" "}
+              {inr(data.settings.cash_goal_inr)} is a team assumption (next-edition base case). Outstanding {inr(s.outstanding_confirmed_cash_inr_simulated)}; overdue{" "}
+              {num(s.overdue_installments_simulated)} ({inr(s.overdue_amount_inr_simulated)}).
             </>
           }
         />
@@ -201,7 +202,7 @@ export default async function OverviewPage() {
           </TableBody>
         </Table>
         <p className="text-xs text-muted-foreground">
-          <Tags kinds={["assumption"]} /> Stale open uses stale days = {data.settings.stale_days} (Settings).
+          <Tags kinds={["assumption"]} /> Stale open uses stale days = {data.settings.stale_days} (Settings). Campaign rows count distinct brands per campaign, so they do not sum to the totals: 12 brands were touched by more than one campaign.
         </p>
       </Section>
     </>

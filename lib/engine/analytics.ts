@@ -39,6 +39,21 @@ export function rankByTieBreak<T extends { value: number; last_update: number; i
   }));
 }
 
+export type StageGroup = "open" | "confirmed" | "closed";
+export const STAGE_GROUP_ORDER: readonly StageGroup[] = ["open", "confirmed", "closed"];
+export const stageGroupOf = (s: Stage): StageGroup => (OPEN_STAGES.has(s) ? "open" : s === "partner_confirmed" ? "confirmed" : "closed");
+
+/**
+ * Pipeline order (REVIEWER NOTE 05 U4): open deals first, then confirmed, then lost or withdrawn; inside
+ * each group the §4 tie break. Ranks run 1..n across groups; ties are only marked inside a group.
+ */
+export function rankGrouped<T extends { value: number; last_update: number; id: string; stage: Stage }>(rows: readonly T[]): (T & { tie: boolean; rank: number; stage_group: StageGroup })[] {
+  const out: (T & { tie: boolean; rank: number; stage_group: StageGroup })[] = [];
+  for (const g of STAGE_GROUP_ORDER)
+    for (const r of rankByTieBreak(rows.filter((x) => stageGroupOf(x.stage) === g))) out.push({ ...r, rank: out.length + 1, stage_group: g });
+  return out;
+}
+
 // ---------------------------------------------------------------- funnel (§4.1)
 export interface FunnelStep {
   key: string;
@@ -141,7 +156,7 @@ export interface PipelineRow {
   source: string;
 }
 
-export function pipelineRows(data: Dataset, asOf: string, settings?: Partial<Settings>): (PipelineRow & { tie: boolean; rank: number })[] {
+export function pipelineRows(data: Dataset, asOf: string, settings?: Partial<Settings>): (PipelineRow & { tie: boolean; rank: number; stage_group: StageGroup })[] {
   const s = { ...data.settings, ...settings };
   const t = istEndOfDay(asOf);
   const campaigns = new Map(data.campaigns.map((c) => [c.sponsor_campaign_id, c.campaign_name]));
@@ -174,7 +189,7 @@ export function pipelineRows(data: Dataset, asOf: string, settings?: Partial<Set
       source: o.source,
     });
   }
-  return rankByTieBreak(rows);
+  return rankGrouped(rows);
 }
 
 /** Open opportunities with no update in more than stale_days, ranked by the §4 tie break (stale list, §4.2). */

@@ -88,6 +88,26 @@ test("Tasks: a new task appears with its owner and due date", async ({ page }) =
   await expect(row).toContainText("user");
 });
 
+test("Settings: Recent changes lists the writes above, newest first (U3)", async ({ page }) => {
+  await page.goto("/settings");
+  const recent = page.getByTestId("recent-changes");
+  await expect(recent).toBeVisible();
+  const actions = await recent.locator("tbody tr td:nth-child(3)").allInnerTexts();
+  expect(actions[0]).toBe("task.create");
+  expect(actions).toEqual(expect.arrayContaining(["opportunity.change", "installment.create", "payment.record", "targets.change", "campaign.status", "task.create", "settings.update"]));
+  await expect(recent.locator("tbody tr").first()).toContainText("User");
+});
+
+test("Pipeline: open deals first, then confirmed, then lost or withdrawn, tie break inside each (U4)", async ({ page }) => {
+  await page.goto("/pipeline");
+  const groups = await page.locator("[data-testid^=group-]").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid")));
+  expect(groups).toEqual(["group-open", "group-confirmed", "group-closed"]);
+  const ids = await page.locator("[data-testid^=opp-row-]").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid")!.replace("opp-row-", "")));
+  // O028 was confirmed in the first flow, so the open group starts with the six ₹90,000 ties in tie-break order.
+  expect(ids.slice(0, 6)).toEqual(["O053", "O038", "O048", "O058", "O033", "O043"]);
+  await expect(page.getByTestId("stage-O028")).toHaveText("Partner confirmed");
+});
+
 test("Settings: Reset to original data returns 24 confirmed and the original goal", async ({ page }) => {
   await page.goto("/settings");
   await page.getByTestId("reset-open").click();
@@ -99,4 +119,6 @@ test("Settings: Reset to original data returns 24 confirmed and the original goa
   await expect(page.getByTestId("cash-collected")).toHaveText("₹18,42,500");
   await page.goto("/campaigns");
   await expect(page.getByTestId("status-SC01")).toHaveText("active");
+  await page.goto("/settings");
+  await expect(page.getByTestId("recent-changes-empty")).toBeVisible();
 });

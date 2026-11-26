@@ -144,7 +144,7 @@ Global header on every page: simulation date picker (default 2025-04-20, range 1
 List, create, edit (name, channel, objective, audience, owner, planned dates, status, planned budget), add spend entries. Show decision badge and the rule that fired.
 
 ### 4.4 Pipeline
-Opportunity table at the simulation date (stage, values, owner, campaign, last update, stale flag) with filters, sorted with the §4 tie break. Row drawer: full version history; actions: change stage, change values, log interaction, create opportunity. The drawer has a brand section with the brand's qualification history and a "change qualification" action. "Create opportunity" can create a new brand and contact in the same form.
+Opportunity table at the simulation date (stage, values, owner, campaign, last update, stale flag) with filters: open deals first, then confirmed, then lost or withdrawn, each group sorted with the §4 tie break (REVIEWER NOTE 05 U4). Row drawer: full version history; actions: change stage, change values, log interaction, create opportunity. The drawer has a brand section with the brand's qualification history and a "change qualification" action. "Create opportunity" can create a new brand and contact in the same form.
 
 ### 4.5 Collections
 Installments with status (paid, due, overdue, upcoming, voided) at the simulation date; installments voided on or before the simulation date are excluded from due, overdue and upcoming. Record payment (full amount; payment date picker with the §2.4 limits). Paid installments of a lost or withdrawn deal are flagged "paid on a withdrawn deal".
@@ -153,7 +153,7 @@ Installments with status (paid, due, overdue, upcoming, voided) at the simulatio
 CRUD with owner, due date, status, links to campaign, opportunity, brand; overdue relative to simulation date; `created_by` shown (copilot created tasks are visibly marked).
 
 ### 4.7 Settings / Data
-Simulation date, assumptions (stage weights, collection rate, stale days, cash goal), targets form (qualified brands goal, confirmed partnerships goal, version label; saving adds a new `targets` version, §2.4), Reset to original data, data dictionary, and a "What this data cannot tell you" list (§6.4).
+Simulation date, assumptions (stage weights, collection rate, stale days, cash goal), targets form (qualified brands goal, confirmed partnerships goal, version label; saving adds a new `targets` version, §2.4), Reset to original data, data dictionary, a "What this data cannot tell you" list (§6.4), and a read only "Recent changes" table with the last 50 audit_log rows: time, actor (user or copilot), action, record (REVIEWER NOTE 05 U3).
 
 Copilot: a right side panel available on every page, plus a full page view.
 

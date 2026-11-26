@@ -26,8 +26,10 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "e2e", testMatch: /flows\.spec\.ts/ },
+    { name: "e2e", testMatch: /(flows|layout)\.spec\.ts/ },
     { name: "screens", testMatch: /screens\.spec\.ts/ },
+    // Live model, run by hand once (npm run demo:rehearse); never part of test:e2e.
+    { name: "demo", testMatch: /demo\.spec\.ts/ },
   ],
   webServer: {
     command: `npx tsx scripts/test-server.ts start ${PORT}`,

@@ -12,6 +12,7 @@ export const PAGES = [
   { href: "/collections", label: "Collections" },
   { href: "/tasks", label: "Tasks" },
   { href: "/settings", label: "Settings" },
+  { href: "/copilot", label: "Copilot" },
 ];
 
 export function NavLinks() {

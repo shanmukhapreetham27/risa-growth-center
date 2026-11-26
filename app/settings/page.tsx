@@ -10,11 +10,12 @@ import { loadDataDictionary } from "@/lib/dictionary";
 import { istEndOfDay, targetInForce } from "@/lib/engine";
 import { inr, istDateTime } from "@/lib/format";
 import { getDataset } from "@/lib/server/data";
+import { recentChanges } from "@/lib/server/audit";
 import { getSql } from "@/lib/server/db";
 import { cn } from "@/lib/utils";
 
 export default async function SettingsPage() {
-  const [data, dict] = await Promise.all([getDataset(), loadDataDictionary(getSql())]);
+  const [data, dict, changes] = await Promise.all([getDataset(), loadDataDictionary(getSql()), recentChanges(getSql(), 50)]);
   const s = data.settings;
   const d = s.simulation_date;
   const inForce = targetInForce(data, istEndOfDay(d));
@@ -91,6 +92,43 @@ export default async function SettingsPage() {
               ))}
             </TableBody>
           </Table>
+      </Section>
+
+      <Section
+        id="recent-changes"
+        title="Recent changes"
+        description="Read only: the last 50 writes from audit_log, newest first (time is real time in IST; the simulated effective time of a change is in its row). Reset clears this list."
+      >
+        {changes.length === 0 ? (
+          <p className="text-sm text-muted-foreground" data-testid="recent-changes-empty">
+            No app writes since the last reset.
+          </p>
+        ) : (
+          <Table data-testid="recent-changes">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Time (IST)</TableHead>
+                <TableHead>Actor</TableHead>
+                <TableHead>Action</TableHead>
+                <TableHead>Table</TableHead>
+                <TableHead>Record</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {changes.map((c) => (
+                <TableRow key={c.id} data-testid={`change-${c.id}`}>
+                  <TableCell className="text-xs">{istDateTime(c.at.getTime())}</TableCell>
+                  <TableCell>
+                    {c.actor === "copilot" ? <span className="rounded bg-violet-600 px-1.5 py-0.5 text-[11px] font-semibold text-white">Copilot</span> : <span className="text-xs">User</span>}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{c.action}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.table_name}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.record_id}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Section>
 
       <Section title="Reset to original data" description="Runs the same reset as npm run db:reset: drops all tables, re-runs the migrations and reloads data/source_csv and data/simulated. Use it before a demo or after grading edits.">

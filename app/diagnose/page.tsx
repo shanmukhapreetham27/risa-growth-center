@@ -163,7 +163,7 @@ export default async function DiagnosePage() {
         </Table>
       </Section>
 
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8">
         {[
           { id: "by-owner", title: "By owner", note: "Owner of the opportunity's latest version.", rows: owners },
           { id: "by-industry", title: "By industry", note: "Industry of the brand.", rows: industries },

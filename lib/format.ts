@@ -36,3 +36,34 @@ export const STAGE_LABEL: Record<string, string> = {
   lost: "Lost",
   withdrawn: "Withdrawn",
 };
+
+/** Human readable labels for stored codes (U5); the stored values never change. */
+export const EVENT_LABEL: Record<string, string> = {
+  outreach_sent: "Outreach sent",
+  delivered: "Delivered",
+  replied: "Replied",
+  meeting_booked: "Meeting booked",
+  meeting_held: "Meeting held",
+  introduction_received: "Introduction received",
+  web_inbound: "Web inbound",
+  opt_out: "Opt out",
+};
+export const QUAL_LABEL: Record<string, string> = {
+  unreviewed: "Unreviewed",
+  engaged: "Engaged",
+  qualified: "Qualified",
+  unqualified: "Unqualified",
+  dormant: "Dormant",
+};
+export const TASK_STATUS_LABEL: Record<string, string> = { open: "Open", in_progress: "In progress", done: "Done", cancelled: "Cancelled" };
+export const CAMPAIGN_STATUS_LABEL: Record<string, string> = { active: "Active", paused: "Paused", stopped: "Stopped" };
+export const CHANNEL_LABEL: Record<string, string> = {
+  email: "Email",
+  introduction: "Introduction",
+  linkedin: "LinkedIn",
+  web_inbound: "Web inbound",
+  referral: "Referral",
+  event: "Event",
+  other: "Other",
+};
+export const labelOf = (map: Record<string, string>, code: string | null | undefined) => (code ? (map[code] ?? code) : "–");

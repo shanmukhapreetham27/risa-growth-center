@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CopilotPanel, CopilotToggle } from "@/components/copilot/copilot-panel";
+import { CopilotProvider } from "@/components/copilot/copilot-provider";
 import { NavLinks } from "@/components/nav-links";
 import { SimDatePicker } from "@/components/sim-date-picker";
 import { Tag } from "@/components/tag";
 import { daysToFestival } from "@/lib/engine/analytics";
 import { dateLabel } from "@/lib/format";
 import { getDataset } from "@/lib/server/data";
+import { owners } from "@/lib/server/lookups";
 import "./globals.css";
 
 // Every page reads live data and must reflect edits immediately (no prerendering, no stale cache).
@@ -27,6 +30,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <CopilotProvider owners={owners(data)}>
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
           <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
             <div className="flex flex-col">
@@ -42,11 +46,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                     <strong className="tabular-nums">{days}</strong> days to festival ({dateLabel("2025-04-12")})
                   </>
                 ) : days === 0 ? (
-                  <strong>Festival starts today</strong>
+                  <strong>Festival day 1 (12 Apr)</strong>
+                ) : days === -1 ? (
+                  <strong>Festival day 2 (13 Apr)</strong>
                 ) : (
-                  <span className="text-muted-foreground">Festival started {-days} days ago</span>
+                  <span className="text-muted-foreground">Festival held 12–13 Apr ({-days} days ago)</span>
                 )}
               </span>
+              <CopilotToggle />
               <span className="flex items-center gap-1 text-xs text-muted-foreground" aria-label="Legend">
                 Legend: <Tag kind="sourced" /> <Tag kind="simulated" /> <Tag kind="assumption" />
               </span>
@@ -54,6 +61,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
         <main className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-8 px-6 py-6">{children}</main>
+          <CopilotPanel />
+        </CopilotProvider>
       </body>
     </html>
   );

@@ -8,7 +8,8 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import type { Task } from "@/lib/engine";
-import { dateLabel } from "@/lib/format";
+import { istDateOf } from "@/lib/engine/time";
+import { dateLabel, TASK_STATUS_LABEL } from "@/lib/format";
 import { getDataset } from "@/lib/server/data";
 import { campaignsList, owners } from "@/lib/server/lookups";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,7 @@ function TaskFields({ t, ownerList, campaigns, brands }: { t?: Task; ownerList: 
         <NativeSelect name="status" defaultValue={t?.status ?? "open"} className="w-full" aria-label="Status">
           {STATUSES.map((s) => (
             <NativeSelectOption key={s} value={s}>
-              {s.replace("_", " ")}
+              {TASK_STATUS_LABEL[s]}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -91,7 +92,7 @@ export default async function TasksPage() {
         </FormDialog>
       </PageTitle>
 
-      <Section title={`Tasks (${tasks.length})`} description="Overdue = due before the simulation date and still open or in progress. Seed tasks are simulated; tasks created by the copilot are marked.">
+      <Section title={`Tasks (${tasks.length})`} description="All tasks are listed; tasks created after the simulation date are flagged. Overdue = due before the simulation date and still open or in progress. Seed tasks are simulated; tasks created by the copilot are marked.">
         <Table data-testid="tasks-table">
           <TableHeader>
             <TableRow>
@@ -113,13 +114,14 @@ export default async function TasksPage() {
                     {t.task_id}
                     {t.notes ? ` · ${t.notes}` : ""}
                   </div>
+                  {istDateOf(t.created_at) > d && <div className="text-[11px] text-amber-700">Created after the simulation date ({istDateOf(t.created_at)})</div>}
                 </TableCell>
                 <TableCell data-testid={`task-owner-${t.task_id}`}>{t.owner_name}</TableCell>
                 <TableCell data-testid={`task-due-${t.task_id}`}>
                   {dateLabel(t.due_date)}
                   {isOverdue(t) && <span className="ml-1 rounded bg-red-100 px-1 text-[10px] font-semibold text-red-900 uppercase">overdue</span>}
                 </TableCell>
-                <TableCell>{t.status.replace("_", " ")}</TableCell>
+                <TableCell>{TASK_STATUS_LABEL[t.status] ?? t.status}</TableCell>
                 <TableCell className="text-xs whitespace-normal">
                   {t.sponsor_campaign_id && <div>Campaign: {campaignName.get(t.sponsor_campaign_id) ?? t.sponsor_campaign_id}</div>}
                   {t.opportunity_ids.length > 0 && (

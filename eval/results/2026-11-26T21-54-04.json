@@ -1,0 +1,122 @@
+{
+ "started": "2026-11-26T21:54:04.589Z",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "totals": {
+  "input": 18,
+  "output": 2163,
+  "read": 34351,
+  "write": 13589,
+  "cost": 0.0590736,
+  "s": 22.200000000000003
+ },
+ "rows": [
+  {
+   "id": "Q01",
+   "type": "fact",
+   "question": "How many confirmed partnerships do we have and how does that compare with the goal?",
+   "expect": "24 confirmed (latest stage partner_confirmed) vs goal 28 from \"Sponsor revised plan\" (effective 15 Mar 2025); 4 short. As of 20 Apr 2025.",
+   "answer": "As of 20 Apr 2025, we have **24 confirmed partnerships** (sourced). The goal is **28**, set in the \"Sponsor revised plan\" that took effect on 15 Mar 2025. We are **4 short**, which is about 86% of the goal.\n\n- Confirmed value is ₹22,40,000: ₹20,00,000 cash and ₹2,40,000 in kind. In kind value is not cash.\n- 24 brands are confirmed, so the count by brand matches the count by opportunity.\n- 26 opportunities are still open, with ₹14,40,000 proposed. All 26 are flagged stale, meaning no update for more than 7 days (the 7 days is an assumption set in Settings).\n\nI can list the open deals that are most likely to close the gap of 4 if you want.",
+   "tools": [
+    {
+     "id": "toolu_01S6NxzGnQqaZR4Ug7NRb9z8",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 902,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 290,
+    "cache_creation_input_tokens": 7218,
+    "cache_read_input_tokens": 5497,
+    "calls": 2
+   },
+   "latency_s": 4.5,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0215067,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q03",
+   "type": "diagnosis",
+   "question": "Why are we behind on partnerships?",
+   "expect": "Cold channels (Brand Discovery Email, Brand Leader LinkedIn, Past Conversation Revival) created 33 opportunities and 0 confirmed; all 26 open opportunities are stale (no stage update in over 7 days). Warm channels converted 24 of 25. Must separate evidence from assumption (no loss reasons in data).",
+   "answer": "**Short answer:** As of 20 Apr 2025, we have 24 confirmed partnerships against a goal of 28 (revised plan, sourced). That is 4 short. The shortfall comes from the cold channels, which have confirmed nothing, and from an open pipeline that has gone stale.\n\n**Evidence (sourced unless noted)**\n- Qualified brands are 60 against a goal of 55, so top-of-funnel qualification is not the problem.\n- All 24 confirmed deals came from warm channels:\n\n| Channel | Opportunities | Confirmed |\n|---|---|---|\n| SC02 Warm Partner Introductions | 9 | 8 |\n| SC04 Partner Interest Form | 7 | 7 |\n| SC05 Creator Network Referrals | 9 | 9 |\n\n- Cold channels have 0 confirmed as of 20 Apr 2025. Cobalt Learning (O006, SC03) was confirmed on 25 Feb and withdrawn on 20 Mar, so a cold deal did close for a time.\n\n| Cold channel | Contacted | Opportunities | Proposals | Confirmed |\n|---|---|---|---|---|\n| SC01 Brand Discovery Email | 91 | 11 | 7 | 0 |\n| SC03 Brand Leader LinkedIn | 37 | 12 | 8 | 0 |\n| SC06 Past Conversation Revival | 20 | 10 | 6 | 0 |\n\n- The bottleneck on every cold channel is proposal to confirmed.\n- There are 26 open opportunities worth ₹14,40,000 proposed. All 26 are stale, with no update in more than 7 days (the stale-day threshold is an assumption). Weighted pipeline is ₹6,27,000 (assumption).\n- 8 deals have been lost or withdrawn.\n- Confirmed value is ₹22,40,000, made up of ₹20,00,000 cash and ₹2,40,000 in kind. In-kind value is not cash.\n- Cash (simulated): ₹17,90,000 was collected before the festival, which is ₹6,56,000 below the team cash goal of ₹24,46,000 (an assumption). 3 installments are overdue, totalling ₹1,57,500.\n\n**Likely explanation (inference)**\n- Cold outreach is producing proposals but not closing them. Most of the open stale deals probably sit in those cold campaigns, though I haven't checked that.\n- The festival has already happened (12–13 Apr). The 26 open deals are unlikely to close for this edition, so the gap is probably now fixed. It matters mainly for planning the next edition.\n\nI can list the stale deals by campaign and owner, or propose follow-up tasks for the overdue installments. Tell me which you want.",
+   "tools": [
+    {
+     "id": "toolu_01XhY7soAuV72i9e8shJzzpH",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 648,
+     "summary": "no arguments as of 2025-04-20"
+    },
+    {
+     "id": "toolu_01NknCDmJjpV13r9JXn1Xf1M",
+     "name": "get_funnel",
+     "input": {
+      "group_by": "campaign"
+     },
+     "ok": true,
+     "ms": 8,
+     "summary": "group_by=campaign as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 1001,
+    "cache_creation_input_tokens": 3112,
+    "cache_read_input_tokens": 10886,
+    "calls": 2
+   },
+   "latency_s": 9.8,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.018890599999999997,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q04",
+   "type": "follow_up",
+   "question": "Of those stuck deals, which are worth the most?",
+   "expect": "Follow up to Q03. Highest is Cedar Pantry (O028, negotiating, ₹1,10,000, Riya Kapoor). Six open deals tie at ₹90,000: O053 Evergreen Living, O038 Daybreak Pantry, O048 Evergreen Pantry, O058 Fable Pantry, O033 Cedar Living, O043 Daybreak Living. Must state the tie. Order inside the tie follows the tie break rule (oldest last update first, then id) and is not graded.",
+   "answer": "The most valuable stuck deal is **Cedar Pantry (O028)**, at ₹1,10,000 proposed. It is in negotiating, owned by Riya Kapoor, in SC03 Brand Leader LinkedIn. It was last updated on 18 Mar 2025, 33 days ago. This is as of 20 Apr 2025. All values are sourced cash proposals. The stale threshold of 7 days is an assumption.\n\nTop 8 stale deals:\n\n| Rank | Deal | Value | Stage | Owner | Campaign | Last update |\n|---|---|---|---|---|---|---|\n| 1 | O028 Cedar Pantry | ₹1,10,000 | negotiating | Riya | SC03 | 18 Mar |\n| 2 | O053 Evergreen Living | ₹90,000 | negotiating | Nisha | SC06 | 6 Feb |\n| 3 | O038 Daybreak Pantry | ₹90,000 | negotiating | Nisha | SC06 | 23 Feb |\n| 4 | O048 Evergreen Pantry | ₹90,000 | negotiating | Riya | SC01 | 4 Mar |\n| 5 | O058 Fable Pantry | ₹90,000 | negotiating | Meera | SC03 | 13 Mar |\n| 6 | O033 Cedar Living | ₹90,000 | negotiating | Riya | SC01 | 21 Mar |\n| 7 | O043 Daybreak Living | ₹90,000 | negotiating | Meera | SC03 | 30 Mar |\n| 8 | O027 Bramble Works | ₹70,000 | negotiating | Riya | SC01 | 10 Mar |\n\n**Ties:**\n- Ranks 2–7 are tied at ₹90,000: O053, O038, O048, O058, O033 and O043. I ordered them by the tie-break rule (value descending, then oldest last update first, then id).\n- Two more deals, O037 Cedar Works and O047 Daybreak Works, are tied at ₹55,000 (proposal_sent). They rank 9 and 10 in this list.\n\nAll of these are cold-channel deals. The top 8 are all in negotiating, and Riya owns four of them (O028, O048, O033 and O027).\n\nI can propose follow-up tasks for these deals. Tell me which deals and which owners you want.",
+   "tools": [
+    {
+     "id": "toolu_01GUuYVkAEkxgrNwB4PQrAkB",
+     "name": "list_opportunities",
+     "input": {
+      "stale_only": true,
+      "limit": 10
+     },
+     "ok": true,
+     "ms": 323,
+     "summary": "10 of 26 opportunities as of 2025-04-20, 2 tie group(s)"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 872,
+    "cache_creation_input_tokens": 3259,
+    "cache_read_input_tokens": 17968,
+    "calls": 2
+   },
+   "latency_s": 7.9,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0186763,
+   "harness_notes": [
+    "Asked in the same conversation as Q03 (follow up).",
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  }
+ ]
+}

@@ -14,3 +14,15 @@ export function getSql(): Sql {
   }
   return g.__risaSql;
 }
+
+const r = globalThis as unknown as { __risaReadonlySql?: Sql };
+
+/** Read only role client for the copilot's query_data tool (SPEC §6.2). */
+export function getReadonlySql(): Sql {
+  if (!r.__risaReadonlySql) {
+    const url = process.env.DATABASE_URL_READONLY;
+    if (!url) throw new Error("DATABASE_URL_READONLY is not set (see .env.example)");
+    r.__risaReadonlySql = makeSql(url, { max: 2 });
+  }
+  return r.__risaReadonlySql;
+}

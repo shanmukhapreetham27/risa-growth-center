@@ -253,14 +253,15 @@ async function campaignValues(tx: Tx, f: CampaignFields): Promise<Row> {
   return out;
 }
 
-export async function updateCampaign(sql: Sql, id: string, fields: CampaignFields, actor: Actor = "user") {
+/** `context` (e.g. the copilot proposal id and reason) is stored with the audit row. */
+export async function updateCampaign(sql: Sql, id: string, fields: CampaignFields, actor: Actor = "user", context?: Record<string, unknown>) {
   return sql.begin(async (tx) => {
     await lockWrites(tx);
     const before = await one(tx, "sponsor_campaigns", "sponsor_campaign_id", id, "Campaign");
     const values = await campaignValues(tx, fields);
     if (Object.keys(values).length === 0) throw new WriteError("Nothing to change");
     const [after] = await tx<Row[]>`update sponsor_campaigns set ${tx(asRow(values))} where sponsor_campaign_id = ${id} returning *`;
-    await audit(tx, actor, fields.status !== undefined && Object.keys(fields).length === 1 ? "campaign.status" : "campaign.update", "sponsor_campaigns", id, before, after);
+    await audit(tx, actor, fields.status !== undefined && Object.keys(fields).length === 1 ? "campaign.status" : "campaign.update", "sponsor_campaigns", id, before, context ? { ...after, context } : after);
     return after;
   });
 }
@@ -358,7 +359,7 @@ async function taskValues(tx: Tx, f: Partial<TaskInput>): Promise<Row> {
   return out;
 }
 
-export async function createTask(sql: Sql, input: TaskInput, actor: Actor = "user", now = Date.now()) {
+export async function createTask(sql: Sql, input: TaskInput, actor: Actor = "user", now = Date.now(), context?: Record<string, unknown>) {
   return sql.begin(async (tx) => {
     await lockWrites(tx);
     const sim = await simulationDate(tx);
@@ -369,7 +370,7 @@ export async function createTask(sql: Sql, input: TaskInput, actor: Actor = "use
     delete row.opportunity_ids;
     const [after] = await tx<Row[]>`insert into tasks ${tx(asRow(row))} returning *`;
     const [withIds] = await tx<Row[]>`update tasks set opportunity_ids = ${ids}::text[] where task_id = ${id} returning *`;
-    await audit(tx, actor, "task.create", "tasks", id, null, withIds ?? after);
+    await audit(tx, actor, "task.create", "tasks", id, null, context ? { ...(withIds ?? after), context } : (withIds ?? after));
     return withIds ?? after;
   });
 }

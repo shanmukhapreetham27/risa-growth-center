@@ -10,12 +10,13 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UrlSheet } from "@/components/url-sheet";
 import { INTERACTION_EVENTS, istEndOfDay, latestBy, pipelineRows, QUAL_STATUSES, STAGES } from "@/lib/engine";
-import { inr, istDateTime, istDay, num, STAGE_LABEL } from "@/lib/format";
+import { EVENT_LABEL, inr, istDateTime, istDay, labelOf, num, QUAL_LABEL, STAGE_LABEL } from "@/lib/format";
 import { getDataset } from "@/lib/server/data";
 import { campaignsList, INDUSTRIES, owners } from "@/lib/server/lookups";
 import { cn } from "@/lib/utils";
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
+const GROUP_LABEL = { open: "Open", confirmed: "Partner confirmed", closed: "Lost or withdrawn" } as const;
 
 export default async function PipelinePage({ searchParams }: PageProps<"/pipeline">) {
   const sp = await searchParams;
@@ -107,7 +108,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
       <Section
         title={`Opportunities (${rows.length} of ${all.length})`}
         kinds={["sourced"]}
-        description={`Latest version of each opportunity created by the simulation date. Sorted by value (confirmed value for confirmed deals, else proposed), then oldest last update first, then id; "tie" marks equal values. Stale = open with no update in more than ${data.settings.stale_days} days (assumption).`}
+        description={`Latest version of each opportunity created by the simulation date. Open deals first, then confirmed, then lost or withdrawn; inside each group by value (confirmed value for confirmed deals, else proposed), then oldest last update first, then id; "tie" marks equal values within a group. Stale = open with no update in more than ${data.settings.stale_days} days (assumption).`}
       >
         <Table data-testid="pipeline-table">
           <TableHeader>
@@ -125,7 +126,14 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((r) => (
+            {rows.map((r, i) => [
+              (i === 0 || rows[i - 1].stage_group !== r.stage_group) && (
+                <TableRow key={`group-${r.stage_group}`} className="bg-muted/50 hover:bg-muted/50" data-testid={`group-${r.stage_group}`}>
+                  <TableCell colSpan={10} className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                    {GROUP_LABEL[r.stage_group]} ({rows.filter((x) => x.stage_group === r.stage_group).length})
+                  </TableCell>
+                </TableRow>
+              ),
               <TableRow key={r.id} data-testid={`opp-row-${r.id}`} className={cn(r.id === oppId && "bg-muted")}>
                 <TableCell className="tabular-nums">{r.rank}</TableCell>
                 <TableCell>
@@ -147,8 +155,8 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
                 <TableCell className="text-xs">{r.campaign_name}</TableCell>
                 <TableCell className="text-xs">{istDay(r.last_update)}</TableCell>
                 <TableCell>{r.stale ? <span className="font-semibold text-amber-700">stale ({r.days_since_update}d)</span> : ""}</TableCell>
-              </TableRow>
-            ))}
+              </TableRow>,
+            ])}
           </TableBody>
         </Table>
       </Section>
@@ -254,7 +262,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
                   <NativeSelect name="event_type" className="w-full" defaultValue="meeting_held" aria-label="Event type">
                     {INTERACTION_EVENTS.map((e) => (
                       <NativeSelectOption key={e} value={e}>
-                        {e}
+                        {EVENT_LABEL[e]}
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>
@@ -291,7 +299,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
               <ul className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground">
                 {interactions.map((i) => (
                   <li key={i.interaction_id}>
-                    {istDateTime(i.occurred_at)} · {i.event_type}
+                    {istDateTime(i.occurred_at)} · {labelOf(EVENT_LABEL, i.event_type)}
                     {i.outcome ? ` (${i.outcome})` : ""} · {i.campaign_name ?? "no campaign"} · {i.interaction_id}
                   </li>
                 ))}
@@ -304,7 +312,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
               Brand: {brand.brand_name} <span className="text-xs font-normal text-muted-foreground">{brand.brand_id} · {brand.industry} · owner {brand.owner_name}</span>
             </h3>
             <p className="text-xs">
-              Qualification at {d}: <strong>{qualNow?.qualification_status ?? "none"}</strong>
+              Qualification at {d}: <strong>{qualNow ? labelOf(QUAL_LABEL, qualNow.qualification_status) : "none"}</strong>
             </p>
             <Table>
               <TableHeader>
@@ -321,7 +329,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
                       {istDateTime(q.effective_at)}
                       {q.effective_at > t && " (after simulation date)"}
                     </TableCell>
-                    <TableCell>{q.qualification_status}</TableCell>
+                    <TableCell>{labelOf(QUAL_LABEL, q.qualification_status)}</TableCell>
                     <TableCell className="max-w-72 text-xs whitespace-normal">{q.reason}</TableCell>
                   </TableRow>
                 ))}
@@ -334,7 +342,7 @@ export default async function PipelinePage({ searchParams }: PageProps<"/pipelin
                   <NativeSelect name="qualification_status" className="w-full" aria-label="New qualification status">
                     {QUAL_STATUSES.map((s) => (
                       <NativeSelectOption key={s} value={s}>
-                        {s}
+                        {QUAL_LABEL[s]}
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>

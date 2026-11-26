@@ -30,6 +30,7 @@ const PAGES = [
   ["06-collections", "/collections"],
   ["07-tasks", "/tasks"],
   ["08-settings", "/settings"],
+  ["09-copilot", "/copilot"],
 ] as const;
 
 for (const [name, path] of PAGES) {
@@ -40,9 +41,9 @@ for (const [name, path] of PAGES) {
     if (name === "05-pipeline-drawer") {
       await expect(page.getByTestId("opportunity-drawer")).toBeVisible();
       await page.waitForTimeout(600); // let the drawer finish sliding in
-      await page.screenshot({ path: `reports/phase-2-screens/${name}.png` });
+      await page.screenshot({ path: `reports/phase-3-screens/${name}.png` });
       return;
     }
-    await page.screenshot({ path: `reports/phase-2-screens/${name}.png`, fullPage: true });
+    await page.screenshot({ path: `reports/phase-3-screens/${name}.png`, fullPage: true });
   });
 }

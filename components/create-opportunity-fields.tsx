@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Field } from "@/components/action-form";
 import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { STAGE_LABEL } from "@/lib/format";
 
 type Opt = { id: string; name: string };
 
@@ -120,7 +121,7 @@ export function CreateOpportunityFields({
         <NativeSelect name="stage" className="w-full" aria-label="Stage">
           {["prospecting", "contacted", "proposal_sent", "negotiating"].map((s) => (
             <NativeSelectOption key={s} value={s}>
-              {s}
+              {STAGE_LABEL[s]}
             </NativeSelectOption>
           ))}
         </NativeSelect>

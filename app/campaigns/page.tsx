@@ -8,7 +8,7 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { campaignRows, istDateOf } from "@/lib/engine";
-import { inr, istDay, pct } from "@/lib/format";
+import { CAMPAIGN_STATUS_LABEL, CHANNEL_LABEL, inr, istDay, labelOf, pct } from "@/lib/format";
 import { getDataset } from "@/lib/server/data";
 import { owners } from "@/lib/server/lookups";
 
@@ -26,7 +26,7 @@ function CampaignFields({ c, ownerList }: { c?: Record<string, unknown>; ownerLi
         <NativeSelect name="channel" defaultValue={v("channel") || "email"} className="w-full">
           {[...new Set([v("channel"), ...CHANNELS].filter(Boolean))].map((x) => (
             <NativeSelectOption key={x} value={x}>
-              {x}
+              {labelOf(CHANNEL_LABEL, x)}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -56,7 +56,7 @@ function CampaignFields({ c, ownerList }: { c?: Record<string, unknown>; ownerLi
         <NativeSelect name="status" defaultValue={v("status") || "active"} className="w-full">
           {["active", "paused", "stopped"].map((s) => (
             <NativeSelectOption key={s} value={s}>
-              {s}
+              {CAMPAIGN_STATUS_LABEL[s]}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -108,7 +108,7 @@ export default async function CampaignsPage() {
                   <TableCell className="max-w-64 whitespace-normal">
                     <div className="font-medium">{c.campaign_name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {c.sponsor_campaign_id} · {c.channel}
+                      {c.sponsor_campaign_id} · {labelOf(CHANNEL_LABEL, c.channel)}
                     </div>
                     <div className="text-xs text-muted-foreground">{c.objective}</div>
                   </TableCell>
@@ -136,7 +136,7 @@ export default async function CampaignsPage() {
                         <NativeSelect name="status" size="sm" defaultValue={c.status} aria-label={`Status of ${c.campaign_name}`}>
                           {["active", "paused", "stopped"].map((s) => (
                             <NativeSelectOption key={s} value={s}>
-                              {s}
+                              {CAMPAIGN_STATUS_LABEL[s]}
                             </NativeSelectOption>
                           ))}
                         </NativeSelect>
