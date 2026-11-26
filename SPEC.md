@@ -58,7 +58,7 @@ App tables (new):
 - `settings` (single row): `simulation_date date default '2025-04-20'`, `stale_days int default 7`, `stage_weights jsonb default {"prospecting":0.10,"contacted":0.20,"proposal_sent":0.40,"negotiating":0.60}`, `collection_rate numeric default 0.90`, `cash_goal_inr int default 2446000` (team goal = strategy base case, label it "team assumption").
 - `tasks`: `task_id, title, sponsor_campaign_id, opportunity_ids text[], brand_id, owner_id, owner_name, due_date, status (open|in_progress|done|cancelled), notes, created_at, created_by (seed|user|copilot), source`. The loader maps the seed `opportunity_id` into a one element array (blank → empty array).
 - `sponsor_campaigns` gets extra columns: `status (active|paused|stopped) default 'active'`. Budget lives in `campaign_budgets`.
-- `payment_installments` gets extra column `voided_at timestamptz` (null = live, see §2.4).
+- `payment_installments` gets extra column `voided_at timestamptz` (null = live, see §2.4); `installment` is `advance`, `balance` or `top_up` (§2.4).
 - `chat_proposals`: `proposal_id, action_type, payload jsonb, status (pending|confirmed|rejected), created_at, resolved_at, result jsonb`.
 - `audit_log`: `id, at, actor (user|copilot), action, table_name, record_id, before jsonb, after jsonb`.
 
@@ -76,8 +76,8 @@ Versioned entities are append only. Never update or delete a source history row.
 
 - Change opportunity stage or value → insert a new row into `opportunity_history` with `history_id = 'APP-OH-<n>'`, all fields of the latest version carried over plus the change, `source='app'`.
   - Moving a cash deal to `partner_confirmed` (when it has no live installments) creates an advance and a balance installment with the §2.1 terms, measured from this version's `effective_at`, `source='app'`.
-  - Moving a deal to `lost` or `withdrawn` sets `voided_at` (= this version's `effective_at`) on its unpaid installments. Paid installments stay, and the UI flags them "paid on a withdrawn deal".
-  - Changing the confirmed value of a confirmed deal rescales its unpaid installments so all its installments sum to the new value (remaining = new value − paid; two unpaid installments split as in §2.1, one unpaid installment takes the remainder).
+  - Moving a confirmed deal to any other stage (`lost`, `withdrawn` or back to an open stage) sets `voided_at` (= this version's `effective_at`) on its unpaid installments. Paid installments stay, and the UI flags them "paid on a withdrawn deal" (lost or withdrawn) or "paid on a deal no longer confirmed" (open stage).
+  - Changing the confirmed value of a confirmed deal rescales its unpaid installments so all its installments sum to the new value (remaining = new value − paid; two unpaid installments split as in §2.1, one unpaid installment takes the remainder). If it has no unpaid installment and the new value rises above the total of its installments, one top up installment (`installment = 'top_up'`) is added for the difference, due at max(the deal's balance due date, this version's `effective_at` + 7 days).
   - `outstanding_confirmed_cash` stays confirmed cash minus collected (§3).
 - Change brand qualification (brand section of the opportunity drawer, §4.4) → new row in `brand_qualification_history` (`APP-BQ-<n>`).
 - Log an interaction → new row in `sponsor_interactions` (`APP-SI-<n>`).

@@ -15,3 +15,4 @@ Hard rules
 9. Log every deviation or judgement call in `docs/DECISIONS.md` (date, spec ref, decision, reason).
 10. Messages starting with `REVIEWER NOTE` are authoritative. `SPEC CHANGE` means: update SPEC.md, implement, log in DECISIONS.md.
 11. End every phase or fix with the report from `docs/REPORTING.md`, commit, tag `phase-<n>`, print the report, then stop and wait.
+12. Never print, cat, grep or search `.env.local` or any secret value (passwords, connection strings, API keys). Exclude `.env*` from every search (for example `--glob '!.env*'` or `--exclude='.env*'`). Scripts may read `.env.local` only to load or update values and must never output them; report presence as present or missing only.

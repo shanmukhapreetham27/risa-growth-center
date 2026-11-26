@@ -145,7 +145,7 @@ export interface Installment {
   opportunity_name: string | null;
   brand_id: string | null;
   brand_name: string | null;
-  installment: "advance" | "balance";
+  installment: "advance" | "balance" | "top_up";
   amount_due_inr: number;
   due_at: number;
   paid_at: number | null;

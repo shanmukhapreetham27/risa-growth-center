@@ -254,6 +254,48 @@ describe("SPEC §2.4 rules", () => {
     expect(by["targets.change"]).toBe(1);
   });
 
+  it("D1: a confirmed deal moved back to an open stage voids its unpaid installments; paid ones stay", async () => {
+    // O028 now: advance 55000 paid, balance 45000 unpaid (after the rescale above).
+    const pre = await snapAt("2025-04-20");
+    const r = await changeOpportunity(sql, { opportunity_id: "O028", stage: "negotiating" }, "user", NOON_IST);
+    expect(r.installments.voided).toHaveLength(1);
+    const rows = await installments("O028");
+    expect(rows.filter((p) => p.voided_at === null).map((p) => [p.installment, p.paid_at !== null])).toEqual([["advance", true]]);
+    const post = await snapAt("2025-04-20");
+    expect(post.confirmed_partnerships).toBe(pre.confirmed_partnerships - 1);
+    expect(post.cash_collected_inr_simulated).toBe(pre.cash_collected_inr_simulated); // paid cash stays collected
+    // Re-confirming bills confirmed value minus what is already paid (N2).
+    const again = await changeOpportunity(sql, { opportunity_id: "O028", stage: "partner_confirmed", confirmed_value_inr: 100000 }, "user", NOON_IST);
+    expect(again.installments.created).toHaveLength(2);
+    const live = (await installments("O028")).filter((p) => p.voided_at === null);
+    expect(live.reduce((a, p) => a + Number(p.amount_due_inr), 0)).toBe(100000);
+  });
+
+  it("D2: raising the value of a fully paid deal adds one top up installment for the difference", async () => {
+    const [deal] = await sql<{ opportunity_id: string }[]>`
+      select opportunity_id from payment_installments where source = 'simulated' and opportunity_id not in ('O001', 'O019', 'O020')
+      group by opportunity_id having bool_and(paid_at is not null) order by opportunity_id limit 1`;
+    const id = deal.opportunity_id;
+    const before = await installments(id);
+    const total = before.reduce((a, p) => a + Number(p.amount_due_inr), 0);
+    const pre = await snapAt("2025-04-20");
+    const r = await changeOpportunity(sql, { opportunity_id: id, confirmed_value_inr: total + 20000 }, "user", NOON_IST);
+    expect(r.installments.created).toHaveLength(1);
+    const [top] = await sql<Row[]>`select * from payment_installments where installment_id = ${r.installments.created[0]}`;
+    const balanceDue = (before.find((p) => p.installment === "balance")!.due_at as Date).getTime();
+    expect(top).toMatchObject({ installment: "top_up", amount_due_inr: 20000, source: "app", paid_at: null });
+    expect((top.due_at as Date).getTime()).toBe(Math.max(balanceDue, r.effective_at + 7 * DAY_MS));
+    const post = await snapAt("2025-04-20");
+    expect(post.confirmed_value_cash_inr).toBe(pre.confirmed_value_cash_inr + 20000);
+    expect(post.outstanding_confirmed_cash_inr_simulated).toBe(pre.outstanding_confirmed_cash_inr_simulated + 20000);
+    // Lowering it back rescales the unpaid top up to 0 (never below what is paid, N1) and adds nothing.
+    const down = await changeOpportunity(sql, { opportunity_id: id, confirmed_value_inr: total }, "user", NOON_IST);
+    expect(down.installments.created).toEqual([]);
+    expect(down.installments.rescaled).toEqual(r.installments.created);
+    const [topAfter] = await sql<Row[]>`select amount_due_inr from payment_installments where installment_id = ${r.installments.created[0]}`;
+    expect(topAfter.amount_due_inr).toBe(0);
+  });
+
   it("settings: simulation date stays inside 15 Jan to 20 Apr 2025", async () => {
     await expect(updateSettings(sql, { simulation_date: "2025-04-21" })).rejects.toThrow(/simulation_date/);
     const s = await updateSettings(sql, { simulation_date: "2025-03-10" });

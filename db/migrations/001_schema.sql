@@ -93,7 +93,7 @@ create table field_guide (
 create table payment_installments (
   installment_id text primary key, opportunity_id text not null references opportunities(opportunity_id),
   opportunity_name text, brand_id text, brand_name text,
-  installment text not null check (installment in ('advance', 'balance')),
+  installment text not null check (installment in ('advance', 'balance', 'top_up')),
   amount_due_inr int not null check (amount_due_inr >= 0), due_at timestamptz not null,
   paid_at timestamptz, amount_paid_inr int not null default 0 check (amount_paid_inr >= 0),
   source text not null default 'simulated', ingest_row int,

@@ -111,8 +111,9 @@ export async function changeOpportunity(sql: Sql, input: OpportunityChange, acto
     const unpaid = live.filter((p) => p.paid_at === null);
     const paidSum = live.filter((p) => p.paid_at !== null).reduce((a, p) => a + Number(p.amount_paid_inr), 0);
 
-    if (LOST_STAGES.has(stage)) {
-      // Lost or withdrawn: void unpaid installments at this version's time; paid ones stay (flagged in the UI).
+    if (LOST_STAGES.has(stage) || (prevStage === "partner_confirmed" && stage !== "partner_confirmed")) {
+      // A confirmed deal leaving partner_confirmed (lost, withdrawn or back to an open stage, REVIEWER NOTE 04 D1):
+      // void unpaid installments at this version's time; paid ones stay (flagged in the UI).
       for (const p of unpaid) {
         const [after] = await tx<Row[]>`
           update payment_installments set voided_at = ${new Date(effectiveAt)} where installment_id = ${p.installment_id as string} returning *`;
@@ -149,6 +150,34 @@ export async function changeOpportunity(sql: Sql, input: OpportunityChange, acto
         await audit(tx, actor, "installment.create", "payment_installments", installmentId, null, row);
         result.installments.created.push(installmentId);
       }
+      return result;
+    }
+
+    if (unpaid.length === 0) {
+      // Everything live is paid and the confirmed value rose above the total (REVIEWER NOTE 04 D2): one top up
+      // installment for the difference, due at max(the deal's balance due date, this version + 7 days).
+      const total = live.reduce((a, p) => a + Number(p.amount_due_inr), 0);
+      if (confirmed <= total) return result;
+      const balanceDue = live.filter((p) => p.installment === "balance").map((p) => ms(p.due_at as Date)!);
+      const dueAt = Math.max(balanceDue.length ? Math.max(...balanceDue) : BALANCE_DUE_DEFAULT, effectiveAt + 7 * DAY_MS);
+      const installmentId = await nextAppId(tx, "payment_installments", "installment_id", "APP-PAY-");
+      const row = {
+        installment_id: installmentId,
+        opportunity_id: input.opportunity_id,
+        opportunity_name: latest.opportunity_name,
+        brand_id: latest.brand_id,
+        brand_name: latest.brand_name,
+        installment: "top_up",
+        amount_due_inr: confirmed - total,
+        due_at: new Date(dueAt),
+        paid_at: null,
+        amount_paid_inr: 0,
+        source: "app",
+        voided_at: null,
+      };
+      await tx`insert into payment_installments ${tx(asRow(row))}`;
+      await audit(tx, actor, "installment.top_up", "payment_installments", installmentId, null, row);
+      result.installments.created.push(installmentId);
       return result;
     }
 
