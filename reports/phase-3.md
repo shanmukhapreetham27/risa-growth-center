@@ -74,7 +74,7 @@ Q1 [BLOCKING, owner]: add credit on the Anthropic account used by ANTHROPIC_API_
 1. The eval and demo are not done (Q1). The copilot's answer quality is verified only for Q01, Q03 and Q04 of run 1, before the prompt change.
 2. The rate limit (30 per hour per IP) and the copilot conversation are in memory: a server restart or a new Vercel instance resets them.
 3. Not deployed yet. Vercel will also need ANTHROPIC_API_KEY, ANTHROPIC_MODEL and DATABASE_URL_READONLY.
-4. Spend-cap 429s are not retryable; the panel shows the error and keeps the question so it can be asked again.
+4. Spend-cap and credit errors are not retryable: the panel shows the error, the question stays on screen, and it is left out of the history sent next time, so asking it again works cleanly.
 
 ## 8. Files changed (tree, new files marked +)
 ```
