@@ -20,7 +20,7 @@
  {
   "id": "Q04",
   "q": "Of those stuck deals, which are worth the most?",
-  "expect": "Follow up to Q03. Top open by proposed value: Cedar Pantry festival partnership (negotiating, ₹110,000, Riya Kapoor); Evergreen Living festival partnership (negotiating, ₹90,000, Nisha Rao); Evergreen Pantry festival partnership (negotiating, ₹90,000, Riya Kapoor); Fable Pantry festival partnership (negotiating, ₹90,000, Meera Iyer); Daybreak Living festival partnership (negotiating, ₹90,000, Meera Iyer). Note: Cedar Pantry is highest at ₹1,10,000; six deals tie at ₹90,000, so the answer should state the tie.",
+  "expect": "Follow up to Q03. Highest is Cedar Pantry (O028, negotiating, ₹1,10,000, Riya Kapoor). Six open deals tie at ₹90,000: O053 Evergreen Living, O038 Daybreak Pantry, O048 Evergreen Pantry, O058 Fable Pantry, O033 Cedar Living, O043 Daybreak Living. Must state the tie. Order inside the tie follows the tie break rule (oldest last update first, then id) and is not graded.",
   "type": "follow_up"
  },
  {
@@ -50,7 +50,7 @@
  {
   "id": "Q09",
   "q": "What is the average confirmed deal size for Food and beverage brands?",
-  "expect": "6 confirmed, ₹550,000 total, average ₹91,667.",
+  "expect": "6 confirmed Food and beverage deals, ₹5,50,000 total, average ₹91,667, which includes 2 in kind deals (O005 ₹1,00,000 and O026 ₹60,000). Cash only: 4 deals, ₹3,90,000, average ₹97,500. Must give both or ask which is meant.",
   "type": "calc"
  },
  {
@@ -62,7 +62,7 @@
  {
   "id": "Q11",
   "q": "Create a task for Riya to follow up the three most valuable negotiating deals by 25 April.",
-  "expect": "Proposes a task (owner Riya Kapoor T01, due 2025-04-25, linked opportunities) and waits for explicit Confirm before writing. Negotiating deals: Cedar Pantry festival partnership ₹110,000; Evergreen Living festival partnership ₹90,000; Evergreen Pantry festival partnership ₹90,000; Fable Pantry festival partnership ₹90,000; Daybreak Living festival partnership ₹90,000; Cedar Living festival partnership ₹90,000; Daybreak Pantry festival partnership ₹90,000; Bramble Works festival partnership ₹70,000. Only Cedar Pantry is uniquely in the top 3; six tie at ₹90,000, so the copilot must flag the tie and ask or state a tie-break rule before proposing.",
+  "expect": "Proposes one task (owner Riya Kapoor T01, due 2025-04-25) linking 3 negotiating deals, and waits for Confirm before writing. Cedar Pantry (O028, ₹1,10,000) is clearly first. Six deals tie at ₹90,000, so it must flag the tie and either ask or apply the tie break rule, which gives O053 Evergreen Living (last update 6 Feb) and O038 Daybreak Pantry (23 Feb).",
   "type": "action"
  },
  {

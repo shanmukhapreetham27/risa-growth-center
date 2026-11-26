@@ -33,8 +33,8 @@ The data is CampusFest 2025: a fictional two day festival, 12 and 13 April 2025,
 Verified findings (all reproduced in `reference_metrics.json`):
 
 1. 180 brands, 60 discovery conversations, 46 proposals, 24 confirmed partnerships. Confirmed value is ₹20,00,000 cash plus ₹2,40,000 in kind. Goal was 28 (revised plan from 15 Mar). 60 brands are qualified against a goal of 55.
-2. **All 24 confirmed deals came from warm channels:** SC02 Warm Partner Introductions, SC04 Partner Interest Form, SC05 Creator Network Referrals.
-3. **The cold channels produced 33 opportunities and 0 deals:** SC01 Brand Discovery Email, SC03 Brand Leader LinkedIn, SC06 Past Conversation Revival. All 26 open opportunities went stale (no update in more than 7 days). Some had not been touched since January.
+2. **As of 20 Apr 2025 all 24 confirmed deals came from warm channels and the cold channels have 0 confirmed. One cold deal, Cobalt Learning (O006, SC03), was confirmed on 25 Feb and withdrew on 20 Mar.** Warm channels: SC02 Warm Partner Introductions, SC04 Partner Interest Form, SC05 Creator Network Referrals. The copilot must never say cold channels "never" converted.
+3. **The cold channels produced 33 opportunities:** SC01 Brand Discovery Email, SC03 Brand Leader LinkedIn, SC06 Past Conversation Revival. All 26 open opportunities went stale (no update in more than 7 days). Some had not been touched since January.
 4. Cold deals spent about twice as long in each stage and were smaller (median proposed ₹55K vs ₹90K).
 5. Traps:
    1. Duplicate import rows.
@@ -63,7 +63,7 @@ Strategy in the deck (the app supports it; do not build strategy features beyond
 ## 5. Clarifications to SPEC.md (binding)
 
 1. **Simulation date:** stored in `settings.simulation_date`. The header picker writes it, so it is persistent and shared. Every page and every copilot tool defaults to it. Writes are stamped from it (SPEC §2.4).
-2. **Test isolation:** tests that reset data must never run against the demo database. Use a Neon branch named `test`, with its connection string in `DATABASE_URL_TEST`. The test runner refuses to start if `DATABASE_URL_TEST` equals `DATABASE_URL`.
+2. **Test isolation:** tests that reset data must never run against the demo database. Use a Neon branch named `test`, with its direct connection string in `DATABASE_URL_TEST` (and the read only role's in `DATABASE_URL_READONLY_TEST`). The test runner refuses to start if `DATABASE_URL_TEST` equals `DATABASE_URL`.
 3. **Connections:** the app uses Neon's pooled connection string (host contains `-pooler`). Migrations and reset use the direct string (`DATABASE_URL_UNPOOLED`).
 4. **Engine approach:** the dataset is tiny (under 2,500 rows). Load the `v_*` views into memory once per request and compute every metric in pure TypeScript functions: `computeSnapshot(data, asOf, opts)`. Pages, copilot tools and tests all call the same functions. Do not write separate SQL for the same metric in two places.
 5. **Owner and industry breakdowns:** owner = `owner_name` of the opportunity's latest version. Industry = the brand's industry.

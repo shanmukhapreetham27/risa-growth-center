@@ -25,7 +25,7 @@ Out of scope: auth, multi tenancy, email sending, real payment integration, mobi
 - LLM: Anthropic Messages API via the official TypeScript SDK `@anthropic-ai/sdk`, using tool use. Model id from env `ANTHROPIC_MODEL`, default `claude-sonnet-5-5`. Before coding the copilot, read the current docs for tool use and for this model (https://platform.claude.com/docs/en/models/sonnet-5-5/overview and its "What's new" and migration pages) and follow them. Known points to respect: setting `temperature`, `top_p` or `top_k` to non default values returns an error; forced tool use (`tool_choice` forcing a specific tool) returns an error, so leave tool choice on auto; adaptive thinking is on, so pass every assistant content block (including thinking blocks) back unchanged in the next request. Record the model id and the date the docs were checked in DECISIONS.md and the README.
 - The API key is server side only (`/api/chat` route). Never send it to the browser.
 - Tests: Vitest. Deploy: Vercel (Hobby).
-- Env vars: `DATABASE_URL` (Neon pooled, demo DB), `DATABASE_URL_UNPOOLED` (direct, for migrations and reset), `DATABASE_URL_READONLY` (read only role, see §6.2), `DATABASE_URL_TEST` (Neon branch `test`, used only by tests), `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
+- Env vars: `DATABASE_URL` (Neon branch `main`, pooled, demo DB), `DATABASE_URL_UNPOOLED` (`main`, direct, for migrations and reset), `DATABASE_URL_READONLY` (read only role on `main`, see §6.2), `DATABASE_URL_TEST` (Neon branch `test`, direct string, used only by tests, including their reset), `DATABASE_URL_READONLY_TEST` (read only role on `test`, used by the `query_data` tests), `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
 - Binding clarifications are in `docs/CONTEXT.md` §5. Reporting rules are in `docs/REPORTING.md`.
 - Money: integers in INR. Display with Indian grouping: ₹7,25,000 and ₹22.4L for compact cards.
 - Time: all business logic in Asia/Kolkata (IST). Source timestamps are ISO with +05:30. Store as `timestamptz`.
@@ -36,7 +36,7 @@ Out of scope: auth, multi tenancy, email sending, real payment integration, mobi
 
 - `data/source_csv/*.csv`: exact export of the provided `Sponsor Dataset.xlsx`, one CSV per sheet, raw, including the duplicate import rows. Do not edit these files.
 - `data/simulated/*.csv`: data the source does not contain, generated with a fixed seed by `scripts_reference/reference_engine.py`, every row tagged `source='simulated'`:
-  - `payment_installments.csv`: two installments (50% advance, 50% balance) per confirmed cash deal. Terms: advance due 7 days after confirmation, balance due 22 Mar 2025 18:00 IST or 7 days after confirmation if later.
+  - `payment_installments.csv`: two installments (50% advance, 50% balance) per confirmed cash deal. Terms: advance (value ÷ 2 rounded down) due 7 days after confirmation, balance (the rest) due 22 Mar 2025 18:00 IST or 7 days after confirmation if later. Cash deals confirmed in the app get installments on the same terms (§2.4).
   - `campaign_budgets.csv`, `campaign_spend.csv`: planned budget and monthly posted spend per sponsor campaign.
   - `tasks.csv`: six seed tasks.
 - `reference_metrics.json`: ground truth numbers your metric engine must reproduce exactly (§7).
@@ -44,20 +44,21 @@ Out of scope: auth, multi tenancy, email sending, real payment integration, mobi
 
 ### 2.2 Schema
 
-Load every source CSV into a table with the same name and columns, plus `source text default 'source'` and `ingest_row int` (row order in file). Keep duplicates in the raw tables.
+Load every source CSV (all 12, including the documentation sheets `read_me` and `field_guide`) into a table with the same name and columns, plus `source text default 'source'` and `ingest_row int` (row order in file). Keep duplicates in the raw tables.
 
 Create dedupe views (the only objects the app and copilot read from):
 
 - `v_interactions`: distinct on `interaction_id` from `sponsor_interactions`.
 - `v_qualification_history`: distinct on `history_id` from `brand_qualification_history`.
 - `v_opportunity_history`: distinct on `history_id` from `opportunity_history`.
-- Plain views over the rest: `v_brands`, `v_contacts`, `v_campaigns`, `v_opportunities`, `v_targets`, `v_activations`, `v_payments`, `v_budgets`, `v_spend`, `v_tasks`.
+- Plain views over the rest: `v_brands`, `v_contacts`, `v_campaigns`, `v_opportunities`, `v_targets`, `v_activations`, `v_payments`, `v_budgets`, `v_spend`, `v_tasks`, `v_event` (festival start and end). `read_me` and `field_guide` get no view; `data_dictionary()` (§6.2) serves the field guide.
 
 App tables (new):
 
 - `settings` (single row): `simulation_date date default '2025-04-20'`, `stale_days int default 7`, `stage_weights jsonb default {"prospecting":0.10,"contacted":0.20,"proposal_sent":0.40,"negotiating":0.60}`, `collection_rate numeric default 0.90`, `cash_goal_inr int default 2446000` (team goal = strategy base case, label it "team assumption").
-- `tasks`: `task_id, title, sponsor_campaign_id, opportunity_id, brand_id, owner_id, owner_name, due_date, status (open|in_progress|done|cancelled), notes, created_at, created_by (seed|user|copilot), source`.
+- `tasks`: `task_id, title, sponsor_campaign_id, opportunity_ids text[], brand_id, owner_id, owner_name, due_date, status (open|in_progress|done|cancelled), notes, created_at, created_by (seed|user|copilot), source`. The loader maps the seed `opportunity_id` into a one element array (blank → empty array).
 - `sponsor_campaigns` gets extra columns: `status (active|paused|stopped) default 'active'`. Budget lives in `campaign_budgets`.
+- `payment_installments` gets extra column `voided_at timestamptz` (null = live, see §2.4).
 - `chat_proposals`: `proposal_id, action_type, payload jsonb, status (pending|confirmed|rejected), created_at, resolved_at, result jsonb`.
 - `audit_log`: `id, at, actor (user|copilot), action, table_name, record_id, before jsonb, after jsonb`.
 
@@ -66,6 +67,7 @@ Team dictionary (owners): T01 Riya Kapoor, T02 Kabir Shah, T03 Meera Iyer, T05 N
 ### 2.3 Seeding and reset
 
 - `npm run db:reset` drops all tables, runs migrations, loads source + simulated CSVs.
+- Migrations grant SELECT on the `v_*` views (and nothing else) to the read only role `risa_readonly`; every reset re-applies the grants. The role itself exists once per Neon branch (created outside migrations) with `default_transaction_read_only = on` and `statement_timeout = 3s` set on the role.
 - Settings page button "Reset to original data" runs the same reset (with a confirm dialog). After reset, tests in §7 must pass against the live DB.
 
 ### 2.4 Write semantics (this is how changed data stays correct)
@@ -73,14 +75,18 @@ Team dictionary (owners): T01 Riya Kapoor, T02 Kabir Shah, T03 Meera Iyer, T05 N
 Versioned entities are append only. Never update or delete a source history row.
 
 - Change opportunity stage or value → insert a new row into `opportunity_history` with `history_id = 'APP-OH-<n>'`, all fields of the latest version carried over plus the change, `source='app'`.
-- Change brand qualification → new row in `brand_qualification_history` (`APP-BQ-<n>`).
+  - Moving a cash deal to `partner_confirmed` (when it has no live installments) creates an advance and a balance installment with the §2.1 terms, measured from this version's `effective_at`, `source='app'`.
+  - Moving a deal to `lost` or `withdrawn` sets `voided_at` (= this version's `effective_at`) on its unpaid installments. Paid installments stay, and the UI flags them "paid on a withdrawn deal".
+  - Changing the confirmed value of a confirmed deal rescales its unpaid installments so all its installments sum to the new value (remaining = new value − paid; two unpaid installments split as in §2.1, one unpaid installment takes the remainder).
+  - `outstanding_confirmed_cash` stays confirmed cash minus collected (§3).
+- Change brand qualification (brand section of the opportunity drawer, §4.4) → new row in `brand_qualification_history` (`APP-BQ-<n>`).
 - Log an interaction → new row in `sponsor_interactions` (`APP-SI-<n>`).
-- New brand / contact / opportunity → new rows with `APP-` prefixed ids.
-- Change targets → new row in `targets` (new `target_version`).
-- Record a payment → update `paid_at` and `amount_paid_inr` on the installment row (payments are events with their own timestamp, so snapshots stay correct).
+- New brand / contact / opportunity → new rows with `APP-` prefixed ids. A new brand and contact are created inside "create opportunity" (§4.4).
+- Change targets (Settings form, §4.7) → new row in `targets` with `effective_at` from the stamp rule and a new `target_version` label (default "App plan <n>").
+- Record a payment → update `paid_at` and `amount_paid_inr` on the installment row (payments are events with their own timestamp, so snapshots stay correct). Full installment amount only. The user picks the payment date (default: the simulation date); it must be on or before the simulation date and on or after the date of the deal's first confirmation. `paid_at` = that date at 15:00 IST. This is the one write that does not use the stamp rule, so a recorded payment can move "cash collected before festival".
 - Campaign fields, budgets, spend, tasks → normal insert/update.
 
-Stamp rule for every app write that needs an event time:
+Stamp rule for every app write that needs an event time (recorded payments excepted, see above):
 `effective_at = max(simulation_date at the current IST wall clock time, latest existing version of that entity + 1 second, entity created_at)`.
 Every write also goes to `audit_log`.
 
@@ -107,7 +113,7 @@ As of date D means end of day D in IST (`D 23:59:59.999999 +05:30`). An entity o
 | cash_collected_inr_simulated | Σ `amount_paid_inr` with `paid_at` ≤ D |
 | cash_collected_before_festival | same, with `paid_at` < festival start (12 Apr 2025 10:00 IST) |
 | outstanding_confirmed_cash | confirmed cash value − cash collected |
-| overdue installments / amount | installments with `due_at` ≤ D and not paid by D |
+| overdue installments / amount | installments with `due_at` ≤ D, not paid by D, and not voided on or before D (an installment with `voided_at` ≤ D is excluded from due, overdue and upcoming at D) |
 | projected_cash_before_festival_inr | if D ≥ festival start: cash collected before festival. Else: collected + (confirmed cash − collected) × collection_rate + Σ(open cash opportunities × stage weight) × collection_rate |
 | targets in force | latest `targets` row with `effective_at` ≤ D (launch plan 40/20, revised plan from 15 Mar 2025: 55/28) |
 
@@ -119,7 +125,7 @@ Daily series (for trend charts): compute the snapshot for every day from 15 Jan 
 
 ## 4. Pages
 
-Global header on every page: simulation date picker (default 2025-04-20, range 15 Jan to 20 Apr 2025, label "Simulation date"), days to festival, and a small legend: Sourced / Simulated / Assumption. Every number that depends on simulated data or an assumption gets that tag.
+Global header on every page: simulation date picker (default 2025-04-20, range 15 Jan to 20 Apr 2025, label "Simulation date"), days to festival, and a small legend: Sourced / Simulated / Assumption. Every number that depends on simulated data or an assumption gets that tag. Every ranked list, in the UI and in copilot tools, breaks ties by value descending, then oldest last update first, then id.
 
 ### 4.1 Overview (Measure)
 - KPI cards: confirmed partnerships vs goal; qualified brands vs goal; confirmed cash value (+ in kind shown separately); cash collected (simulated) vs team cash goal; open pipeline and weighted pipeline; projected cash before festival.
@@ -138,16 +144,16 @@ Global header on every page: simulation date picker (default 2025-04-20, range 1
 List, create, edit (name, channel, objective, audience, owner, planned dates, status, planned budget), add spend entries. Show decision badge and the rule that fired.
 
 ### 4.4 Pipeline
-Opportunity table at the simulation date (stage, values, owner, campaign, last update, stale flag) with filters. Row drawer: full version history; actions: change stage, change values, log interaction, create opportunity.
+Opportunity table at the simulation date (stage, values, owner, campaign, last update, stale flag) with filters, sorted with the §4 tie break. Row drawer: full version history; actions: change stage, change values, log interaction, create opportunity. The drawer has a brand section with the brand's qualification history and a "change qualification" action. "Create opportunity" can create a new brand and contact in the same form.
 
 ### 4.5 Collections
-Installments with status (paid, due, overdue, upcoming) at the simulation date; record payment.
+Installments with status (paid, due, overdue, upcoming, voided) at the simulation date; installments voided on or before the simulation date are excluded from due, overdue and upcoming. Record payment (full amount; payment date picker with the §2.4 limits). Paid installments of a lost or withdrawn deal are flagged "paid on a withdrawn deal".
 
 ### 4.6 Tasks
 CRUD with owner, due date, status, links to campaign, opportunity, brand; overdue relative to simulation date; `created_by` shown (copilot created tasks are visibly marked).
 
 ### 4.7 Settings / Data
-Simulation date, assumptions (stage weights, collection rate, stale days, cash goal), Reset to original data, data dictionary, and a "What this data cannot tell you" list (§6.4).
+Simulation date, assumptions (stage weights, collection rate, stale days, cash goal), targets form (qualified brands goal, confirmed partnerships goal, version label; saving adds a new `targets` version, §2.4), Reset to original data, data dictionary, and a "What this data cannot tell you" list (§6.4).
 
 Copilot: a right side panel available on every page, plus a full page view.
 
@@ -171,15 +177,15 @@ Expected on 20 Apr and 15 Mar 2025: SC01 STOP, SC02 SCALE, SC03 CHANGE, SC04 SCA
 - `get_overview(as_of)`: all §3 metrics + targets.
 - `get_funnel(as_of, group_by?: campaign|channel_group|owner|industry, campaign_id?)`
 - `compare_snapshots(date_a, date_b)`
-- `list_opportunities(as_of, stage?, campaign_id?, owner_id?, stale_only?, min_value?, sort?, limit?)`
+- `list_opportunities(as_of, stage?, campaign_id?, owner_id?, stale_only?, min_value?, sort?, limit?)`: ordered with the §4 tie break; the result says which items tie
 - `get_opportunity_history(opportunity_id | name)`
 - `get_campaign_decisions(as_of)`: badges + metrics + rule fired
 - `get_collections(as_of, status?: paid|due|overdue|upcoming|all)`
 - `get_budgets(as_of)`
 - `list_tasks(status?, owner_id?, overdue_only?)`
-- `query_data(sql)`: read only SELECT against `v_*` views only, through `DATABASE_URL_READONLY` (a Postgres role with SELECT on views only), `statement_timeout` 3s, auto `LIMIT 200`, reject anything that is not a single SELECT. For long tail questions the fixed tools do not cover.
+- `query_data(sql)`: read only SELECT against `v_*` views only, through `DATABASE_URL_READONLY` (role `risa_readonly`, SELECT on views only; tests use `DATABASE_URL_READONLY_TEST`), `statement_timeout` 3s, auto `LIMIT 200`, reject anything that is not a single SELECT. For long tail questions the fixed tools do not cover.
 - `calculate(expression)`: safe math (mathjs). Every number the model derives must go through this.
-- `data_dictionary()`: tables, fields, which are sourced / simulated / assumption, and the gaps list (§6.4).
+- `data_dictionary()`: tables, fields (including the source `field_guide` rows), which are sourced / simulated / assumption, and the gaps list (§6.4).
 - `propose_task(title, owner_id, due_date, sponsor_campaign_id?, opportunity_ids?, brand_id?, notes?)`
 - `propose_campaign_status(sponsor_campaign_id, status, reason)`
 
@@ -187,11 +193,11 @@ Propose tools only insert a `chat_proposals` row (status pending) and return it.
 
 ### 6.3 System prompt rules (put in `lib/copilot/system-prompt.ts`)
 1. Use tools for every fact and number. Never answer data questions from general knowledge.
-2. Always state the as of date used. Tag figures as sourced, simulated or assumption.
+2. Always state the as of date used. Tag figures as sourced, simulated or assumption. Never turn a fact that holds at one date into "never" or "always" (cold channels have 0 confirmed as of 20 Apr, but Cobalt Learning, a cold deal, was confirmed from 25 Feb to 20 Mar).
 3. Do arithmetic with `calculate`, never in your head.
 4. Separate "Evidence" (from tools) from "Likely explanation" (inference) when diagnosing.
 5. If the data cannot answer, say so plainly, say which field or table is missing, and offer what you can do instead (for example propose a task to collect it).
-6. When results tie or the request is ambiguous, say so and either ask or state the tie break rule used.
+6. When results tie, always say so, then either ask or apply the tie break rule (value descending, then oldest last update first, then id) and name it. When the request is ambiguous, say so and ask.
 7. For actions, call a propose tool and wait for the user's confirmation.
 8. Be concise. Use a small table when comparing more than three items. INR with Indian grouping.
 9. Only discuss this festival's sponsorship data and plan; politely decline unrelated requests.
@@ -212,8 +218,8 @@ Add a "Demo script" section to the README with these steps.
 ## 7. Tests (must pass before UI work is called done)
 
 - `tests/metrics.test.ts`: for every date in `reference_metrics.json.snapshots`, every metric equals the reference exactly. Same for `by_campaign_final`, `by_campaign_2025-03-15`, `by_owner_final`, `by_industry_final`, `edge_cases`, decisions.
-- `tests/writes.test.ts`: on a fresh reset DB with simulation date 2025-04-20, (a) changing one open opportunity to partner_confirmed raises confirmed_partnerships to 25 at 20 Apr and leaves the 10 Mar snapshot at 15; (b) recording a payment raises cash collected by that amount; (c) reset restores the reference numbers.
-- `tests/tools.test.ts`: each copilot read tool returns numbers identical to the engine.
+- `tests/writes.test.ts`: on a fresh reset DB with simulation date 2025-04-20, (a) changing one open opportunity to partner_confirmed raises confirmed_partnerships to 25 at 20 Apr and leaves the 10 Mar snapshot at 15; (b) recording a payment raises cash collected by that amount; (c) reset restores the reference numbers; (d) confirming a cash deal creates two `source='app'` installments that sum to its confirmed value; (e) withdrawing a deal voids its unpaid installments, which then leave overdue; (f) a payment dated before 12 Apr raises cash_collected_before_festival by its amount.
+- `tests/tools.test.ts`: each copilot read tool returns numbers identical to the engine; `query_data` runs through `DATABASE_URL_READONLY_TEST`.
 - `scripts/verify.ts` (`npm run verify`): read only check of the demo DB against the reference, exact output format in `docs/REPORTING.md` §4.
 - All reset based tests run on `DATABASE_URL_TEST` only.
 - `scripts/eval-copilot.ts` (`npm run eval:copilot`): runs `copilot_eval_questions.json` against the live model, saves transcripts to `eval/results/<timestamp>.md`. Not part of CI; reviewed by hand.

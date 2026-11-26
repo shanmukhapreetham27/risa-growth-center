@@ -10,7 +10,7 @@ The reviewer cannot see the repo, run code or open the app. It only sees what th
 
 Write the report to `reports/phase-<n>.md` (or `reports/fix-<nn>.md` for a REVIEWER NOTE), commit it, and print it in full in the terminal as your final message.
 
-## 2. Phase report template (keep under 150 lines)
+## 2. Phase report template (keep under 250 lines; long lists go in an Appendix section at the end)
 
 ```
 # PHASE <n> REPORT
@@ -52,6 +52,9 @@ Commands or URL, and which page to open.
 
 ## 10. Ready for next phase?
 YES / NO, and what is needed.
+
+## Appendix (optional)
+Long lists (questions, checks, trees) that would crowd the sections above.
 ```
 
 ## 3. Fix report template (after a REVIEWER NOTE)
@@ -110,3 +113,4 @@ Also paste the full answer text for every FAIL or PARTIAL and for Q03, Q04, Q07 
 - Say "verified by <command or test>" or "not verified".
 - If you changed your mind on something, say what and why.
 - Prefer one line per item.
+- Any report (phase or fix) may run to 250 lines. Put long lists in an Appendix section at the end.
