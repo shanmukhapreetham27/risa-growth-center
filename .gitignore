@@ -1,7 +1,27 @@
-node_modules/
-.next/
-.env.local
-.env*.local
-.vercel/
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# env files: real values live only in .env.local; the template is committed
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+*.pem
 *.log
 __pycache__/
