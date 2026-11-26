@@ -52,6 +52,8 @@ export interface Snapshot {
 export interface SnapshotOptions {
   /** Filter to one sponsor campaign (interactions by campaign, opportunities by originating campaign). */
   campaignId?: string;
+  /** Filter to a set of campaigns (channel groups, SPEC §4.2); same rules as campaignId. */
+  campaignIds?: readonly string[];
   /** Override assumptions (stage weights, collection rate, stale days) for what-if checks. */
   settings?: Partial<Settings>;
 }
@@ -80,7 +82,12 @@ const nunique = <T>(xs: readonly T[]) => new Set(xs).size;
 
 export function computeSnapshot(data: Dataset, asOf: string, opts: SnapshotOptions = {}): Snapshot {
   const s: Settings = { ...data.settings, ...opts.settings };
-  const campaign = opts.campaignId;
+  const scope: ReadonlySet<string> | null = opts.campaignId
+    ? new Set([opts.campaignId])
+    : opts.campaignIds
+      ? new Set(opts.campaignIds)
+      : null;
+  const campaign = scope !== null;
   const FEST_START = data.event.event_starts_at;
   // t=eod(d)
   const t = istEndOfDay(asOf);
@@ -90,8 +97,8 @@ export function computeSnapshot(data: Dataset, asOf: string, opts: SnapshotOptio
   let O = data.opportunities.filter((x) => x.created_at <= t);
   // if campaign: I=I[I.sponsor_campaign_id==campaign]; O=O[O.sponsor_campaign_id==campaign]
   if (campaign) {
-    I = I.filter((x) => x.sponsor_campaign_id === campaign);
-    O = O.filter((x) => x.sponsor_campaign_id === campaign);
+    I = I.filter((x) => x.sponsor_campaign_id !== null && scope.has(x.sponsor_campaign_id));
+    O = O.filter((x) => x.sponsor_campaign_id !== null && scope.has(x.sponsor_campaign_id));
   }
   const oById = new Map(O.map((o) => [o.opportunity_id, o]));
   const ohO = data.oppHistory.filter((h) => oById.has(h.opportunity_id));

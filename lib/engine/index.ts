@@ -4,3 +4,4 @@ export { computeSnapshot, dailySeries, latestBy, targetInForce, type Snapshot, t
 export { decide, campaignDecisions, type Badge, type Decision, type CampaignDecision } from "./decisions";
 export { byOwner, byIndustry, edgeCases, budgets, type GroupStats, type EdgeCases, type BudgetLine } from "./breakdowns";
 export { loadDataset, loadSettings } from "./load";
+export * from "./analytics";

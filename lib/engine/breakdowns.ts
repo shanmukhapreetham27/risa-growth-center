@@ -4,12 +4,15 @@
  */
 import { latestBy } from "./snapshot";
 import { istEndOfDay } from "./time";
-import type { Dataset } from "./types";
+import { type Dataset, LOST_STAGES, OPEN_STAGES, type Stage } from "./types";
 
 export interface GroupStats {
   opportunities: number;
   confirmed: number;
   confirmed_value_inr: number;
+  /** Not in the reference; shown on Diagnose. */
+  open: number;
+  lost_or_withdrawn: number;
 }
 
 // L=latest(oh,'opportunity_id',t).merge(brands[['brand_id','industry']],on='brand_id')
@@ -22,8 +25,10 @@ function groupStats<T extends { stage: string; confirmed_value_inr: number }>(ro
   for (const r of rows) {
     const k = key(r);
     if (k === null) continue; // pandas groupby drops null keys
-    const g = (out[k] ??= { opportunities: 0, confirmed: 0, confirmed_value_inr: 0 });
+    const g = (out[k] ??= { opportunities: 0, confirmed: 0, confirmed_value_inr: 0, open: 0, lost_or_withdrawn: 0 });
     g.opportunities += 1;
+    if (OPEN_STAGES.has(r.stage as Stage)) g.open += 1;
+    if (LOST_STAGES.has(r.stage as Stage)) g.lost_or_withdrawn += 1;
     if (r.stage === "partner_confirmed") {
       g.confirmed += 1;
       g.confirmed_value_inr += r.confirmed_value_inr;

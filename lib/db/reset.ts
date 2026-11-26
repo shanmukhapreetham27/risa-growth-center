@@ -110,21 +110,22 @@ function insertStatement(table: string, rows: Record<string, unknown>[]): string
  */
 export async function resetDatabase(sql: Sql, opts: ResetOptions = {}): Promise<ResetSummary> {
   const started = Date.now();
-  const dataDir = opts.dataDir ?? path.join(process.cwd(), "data");
-  const migrationsDir = opts.migrationsDir ?? path.join(process.cwd(), "db", "migrations");
-  const migrations = readdirSync(migrationsDir).filter((f) => /^\d+_.*\.sql$/.test(f)).sort();
+  // turbopackIgnore: these are read at runtime; next.config.ts ships data/ and db/migrations/ explicitly.
+  const dataDir = opts.dataDir ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "data");
+  const migrationsDir = opts.migrationsDir ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "db", "migrations");
+  const migrations = readdirSync(/*turbopackIgnore: true*/ migrationsDir).filter((f) => /^\d+_.*\.sql$/.test(f)).sort();
   const counts: Record<string, number> = {};
 
   await sql.begin(async (tx) => {
     await tx.unsafe(DROP_ALL);
-    for (const m of migrations) await tx.unsafe(readFileSync(path.join(migrationsDir, m), "utf8"));
+    for (const m of migrations) await tx.unsafe(readFileSync(path.join(/*turbopackIgnore: true*/ migrationsDir, m), "utf8"));
     const types = await columnTypes(tx);
     const statements: string[] = [];
 
     for (const { table, file } of CSV_TABLES) {
       const t = types.get(table);
       if (!t) throw new Error(`Table ${table} is missing after migrations`);
-      const rows = csvRows(path.join(dataDir, file), table, t);
+      const rows = csvRows(path.join(/*turbopackIgnore: true*/ dataDir, file), table, t);
       if (rows.length) statements.push(insertStatement(table, rows));
       counts[table] = rows.length;
     }
@@ -132,7 +133,7 @@ export async function resetDatabase(sql: Sql, opts: ResetOptions = {}): Promise<
     // tasks: seed opportunity_id -> opportunity_ids text[] (one element, blank -> empty), created_by 'seed' (D3).
     const taskTypes = new Map(types.get("tasks"));
     taskTypes.set("opportunity_id", "text");
-    const { header, rows } = readCsv(path.join(dataDir, TASKS_FILE));
+    const { header, rows } = readCsv(path.join(/*turbopackIgnore: true*/ dataDir, TASKS_FILE));
     const tasks = rows.map((r, i) => {
       const o: Record<string, unknown> = {};
       header.forEach((h, j) => {
