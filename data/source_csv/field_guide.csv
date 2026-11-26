@@ -1,0 +1,88 @@
+source_table,field,data_type,meaning
+event.csv,event_name,text,Fictional event display name.
+event.csv,history_start,date,First covered snapshot date.
+event.csv,history_end,date,Last covered snapshot date.
+event.csv,event_starts_at,datetime,Planned event opening timestamp in IST.
+event.csv,event_ends_at,datetime,Planned event closing timestamp in IST.
+event.csv,timezone,text,Timezone for selected-day snapshots.
+event.csv,currency,text,Currency used for marketing spend and reported sponsor values.
+event.csv,fictional,boolean,All source records are synthetic.
+targets.csv,effective_at,datetime,This full version of the targets takes effect at this timestamp.
+targets.csv,qualified_brands_goal,number,Target brands whose latest qualification is qualified.
+targets.csv,confirmed_partnerships_goal,number,Target opportunities whose latest stage is partner_confirmed.
+targets.csv,target_version,text,Readable label for the dated target plan.
+brands.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+brands.csv,industry,text,Broad business category of the fictional brand.
+brands.csv,owner_name,text,Readable name of the responsible festival team member.
+brands.csv,created_at,datetime,"First existence of this static source record, in ISO 8601 India time."
+brands.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+brands.csv,owner_id,text,Stable team identity; readable owner_name is supplied in the same row where applicable.
+contacts.csv,contact_name,text,Readable fictional person name. People with the same name may have different contact_id values.
+contacts.csv,job_title,text,Fictional contact role at the brand.
+contacts.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+contacts.csv,created_at,datetime,"First existence of this static source record, in ISO 8601 India time."
+contacts.csv,contact_id,text,Stable person identity. One brand can have several people.
+contacts.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+sponsor_campaigns.csv,campaign_name,text,Readable sponsorship acquisition campaign label.
+sponsor_campaigns.csv,channel,text,"Acquisition channel: email, linkedin, introduction or web_inbound."
+sponsor_campaigns.csv,objective,text,Business aim of this acquisition campaign.
+sponsor_campaigns.csv,audience,text,Intended audience for the campaign.
+sponsor_campaigns.csv,owner_name,text,Readable name of the responsible festival team member.
+sponsor_campaigns.csv,planned_start_at,datetime,"Planned start time, not evidence that an outreach or outcome occurred."
+sponsor_campaigns.csv,planned_end_at,datetime,"Planned end time, not a realized result."
+sponsor_campaigns.csv,created_at,datetime,"First existence of this static source record, in ISO 8601 India time."
+sponsor_campaigns.csv,sponsor_campaign_id,text,Stable sponsorship acquisition campaign identity (SC prefix); distinct from attendee campaign IDs.
+sponsor_campaigns.csv,owner_id,text,Stable team identity; readable owner_name is supplied in the same row where applicable.
+sponsor_interactions.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+sponsor_interactions.csv,contact_name,text,Readable fictional person name. People with the same name may have different contact_id values.
+sponsor_interactions.csv,campaign_name,text,Readable sponsorship acquisition campaign label.
+sponsor_interactions.csv,channel,text,"Acquisition channel: email, linkedin, introduction or web_inbound."
+sponsor_interactions.csv,event_type,text,"One event: outreach_sent, delivered, replied, meeting_booked, meeting_held, opt_out, introduction_received or web_inbound."
+sponsor_interactions.csv,outcome,text,Recorded result: sent/delivered; replied classification positive/neutral/not_interested/wrong_contact; scheduled/attended; do_not_contact; introduced/interest_submitted.
+sponsor_interactions.csv,summary,text,Fictional source note describing the observed event and its limit.
+sponsor_interactions.csv,occurred_at,datetime,Actual event timestamp in ISO 8601 India time. Include only when <= selected cutoff.
+sponsor_interactions.csv,interaction_id,text,Stable event identity. Identical copies with this same ID are import retries.
+sponsor_interactions.csv,attempt_id,text,One source touch/attempt and its follow-on events. A repeat outreach uses a new attempt ID.
+sponsor_interactions.csv,origin_interaction_id,text,ID of the root source-touch event for a delivery/response/meeting/opt-out. Blank on the root event itself.
+sponsor_interactions.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+sponsor_interactions.csv,contact_id,text,Stable person identity. One brand can have several people.
+sponsor_interactions.csv,sponsor_campaign_id,text,Stable sponsorship acquisition campaign identity (SC prefix); distinct from attendee campaign IDs.
+sponsor_interactions.csv,owner_id,text,Stable team identity; readable owner_name is supplied in the same row where applicable.
+brand_qualification_history.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+brand_qualification_history.csv,qualification_status,text,"Current assessed brand state at effective_at: unreviewed, engaged, qualified, unqualified or dormant."
+brand_qualification_history.csv,reason,text,Source explanation of the assessment; contact interest alone need not imply brand qualification.
+brand_qualification_history.csv,source_campaign_name,text,Readable label for the acquisition source underlying this assessment.
+brand_qualification_history.csv,effective_at,datetime,When this full-state version became effective. Use latest version <= selected India end-of-day; do not sum history states.
+brand_qualification_history.csv,history_id,text,Stable version identity. Same ID with an identical payload is an import retry.
+brand_qualification_history.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+brand_qualification_history.csv,sponsor_campaign_id,text,Stable sponsorship acquisition campaign identity (SC prefix); distinct from attendee campaign IDs.
+opportunities.csv,opportunity_name,text,Readable opportunity label. A brand may have several distinct opportunities.
+opportunities.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+opportunities.csv,primary_contact_name,text,Readable label for the primary contact attached at opportunity creation.
+opportunities.csv,originating_campaign_name,text,Acquisition campaign recorded as the source at opportunity creation; later channel overlap does not overwrite it.
+opportunities.csv,support_type,text,Proposed sponsorship consideration: cash or in_kind. This is not bank-receipt evidence.
+opportunities.csv,created_at,datetime,"First existence of this static source record, in ISO 8601 India time."
+opportunities.csv,opportunity_id,text,"Stable identity of one potential partnership, distinct from the brand."
+opportunities.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+opportunities.csv,primary_contact_id,text,Stable person ID for the opportunity primary contact; joins contacts.contact_id.
+opportunities.csv,sponsor_campaign_id,text,Stable sponsorship acquisition campaign identity (SC prefix); distinct from attendee campaign IDs.
+opportunity_history.csv,opportunity_name,text,Readable opportunity label. A brand may have several distinct opportunities.
+opportunity_history.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+opportunity_history.csv,stage,text,"Full-state opportunity stage: prospecting, contacted, proposal_sent, negotiating, partner_confirmed, lost or withdrawn."
+opportunity_history.csv,proposed_value_inr,number,"Optional face-value estimate in whole INR for this opportunity, including agreed in-kind value where relevant. No tax or cash receipt model."
+opportunity_history.csv,confirmed_value_inr,number,Optional simple confirmed partnership value at this version. Zero unless stage is partner_confirmed; not cash collected.
+opportunity_history.csv,owner_name,text,Readable name of the responsible festival team member.
+opportunity_history.csv,effective_at,datetime,When this full-state version became effective. Use latest version <= selected India end-of-day; do not sum history states.
+opportunity_history.csv,history_id,text,Stable version identity. Same ID with an identical payload is an import retry.
+opportunity_history.csv,opportunity_id,text,"Stable identity of one potential partnership, distinct from the brand."
+opportunity_history.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+opportunity_history.csv,owner_id,text,Stable team identity; readable owner_name is supplied in the same row where applicable.
+sponsor_activations.csv,brand_name,text,"Readable fictional brand label. Join with brand_id, since labels are not primary keys."
+sponsor_activations.csv,opportunity_name,text,Readable opportunity label. A brand may have several distinct opportunities.
+sponsor_activations.csv,attendee_campaign_name,text,Readable attendee acquisition campaign label from the separate attendee dataset.
+sponsor_activations.csv,activation_note,text,Source description of the sponsor-to-attendee-campaign association and its causal limit.
+sponsor_activations.csv,linked_at,datetime,"When the activation association became effective, in ISO 8601 India time."
+sponsor_activations.csv,activation_id,text,Stable identity of this cross-dataset association.
+sponsor_activations.csv,brand_id,text,"Stable sponsor brand identity; shared across contacts, outreach and opportunities."
+sponsor_activations.csv,opportunity_id,text,"Stable identity of one potential partnership, distinct from the brand."
+sponsor_activations.csv,attendee_campaign_id,text,Stable C-prefixed campaign identity to join the attendee acquisition dataset.

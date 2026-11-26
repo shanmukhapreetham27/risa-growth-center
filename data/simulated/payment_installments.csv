@@ -1,0 +1,41 @@
+installment_id,opportunity_id,opportunity_name,brand_id,brand_name,installment,amount_due_inr,due_at,paid_at,amount_paid_inr,source
+PAY001,O001,Beardo festival partnership,A001,Beardo,advance,100000,2025-03-15T12:00:00+05:30,2025-03-14T15:00:00+05:30,100000,simulated
+PAY002,O001,Beardo festival partnership,A001,Beardo,balance,100000,2025-03-22T18:00:00+05:30,2025-03-20T15:00:00+05:30,100000,simulated
+PAY003,O003,Juniper Foods festival partnership,A002,Juniper Foods,advance,60000,2025-02-19T12:00:00+05:30,2025-02-18T15:00:00+05:30,60000,simulated
+PAY004,O003,Juniper Foods festival partnership,A002,Juniper Foods,balance,60000,2025-03-22T18:00:00+05:30,2025-04-03T15:00:00+05:30,60000,simulated
+PAY005,O004,Mosaic Mobility festival partnership,A003,Mosaic Mobility,advance,75000,2025-04-09T12:00:00+05:30,2025-04-04T15:00:00+05:30,75000,simulated
+PAY006,O004,Mosaic Mobility festival partnership,A003,Mosaic Mobility,balance,75000,2025-04-09T12:00:00+05:30,2025-04-05T15:00:00+05:30,75000,simulated
+PAY007,O007,Maple Devices festival partnership,A006,Maple Devices,advance,45000,2025-03-08T12:00:00+05:30,2025-03-07T15:00:00+05:30,45000,simulated
+PAY008,O007,Maple Devices festival partnership,A006,Maple Devices,balance,45000,2025-03-22T18:00:00+05:30,2025-03-18T15:00:00+05:30,45000,simulated
+PAY009,O008,Aster Pantry festival partnership,A007,Aster Pantry,advance,25000,2025-02-21T12:00:00+05:30,2025-02-17T15:00:00+05:30,25000,simulated
+PAY010,O008,Aster Pantry festival partnership,A007,Aster Pantry,balance,25000,2025-03-22T18:00:00+05:30,2025-03-19T15:00:00+05:30,25000,simulated
+PAY011,O009,Aster Studio festival partnership,A008,Aster Studio,advance,32500,2025-02-24T12:00:00+05:30,2025-02-24T15:00:00+05:30,32500,simulated
+PAY012,O009,Aster Studio festival partnership,A008,Aster Studio,balance,32500,2025-03-22T18:00:00+05:30,2025-04-04T15:00:00+05:30,32500,simulated
+PAY013,O010,Aster Devices festival partnership,A009,Aster Devices,advance,40000,2025-02-27T12:00:00+05:30,2025-02-26T15:00:00+05:30,40000,simulated
+PAY014,O010,Aster Devices festival partnership,A009,Aster Devices,balance,40000,2025-03-22T18:00:00+05:30,2025-03-19T15:00:00+05:30,40000,simulated
+PAY015,O011,Aster Active festival partnership,A010,Aster Active,advance,47500,2025-03-02T12:00:00+05:30,2025-03-01T15:00:00+05:30,47500,simulated
+PAY016,O011,Aster Active festival partnership,A010,Aster Active,balance,47500,2025-03-22T18:00:00+05:30,2025-03-17T15:00:00+05:30,47500,simulated
+PAY017,O012,Aster Learning festival partnership,A011,Aster Learning,advance,55000,2025-03-05T12:00:00+05:30,2025-02-28T15:00:00+05:30,55000,simulated
+PAY018,O012,Aster Learning festival partnership,A011,Aster Learning,balance,55000,2025-03-22T18:00:00+05:30,2025-03-26T15:00:00+05:30,55000,simulated
+PAY019,O013,Aster Living festival partnership,A012,Aster Living,advance,62500,2025-03-08T12:00:00+05:30,2025-03-06T15:00:00+05:30,62500,simulated
+PAY020,O013,Aster Living festival partnership,A012,Aster Living,balance,62500,2025-03-22T18:00:00+05:30,2025-04-03T15:00:00+05:30,62500,simulated
+PAY021,O014,Aster Collective festival partnership,A013,Aster Collective,advance,45000,2025-03-11T12:00:00+05:30,2025-03-06T15:00:00+05:30,45000,simulated
+PAY022,O014,Aster Collective festival partnership,A013,Aster Collective,balance,45000,2025-03-22T18:00:00+05:30,2025-03-21T15:00:00+05:30,45000,simulated
+PAY023,O015,Aster Wellness festival partnership,A014,Aster Wellness,advance,52500,2025-03-14T12:00:00+05:30,2025-03-08T15:00:00+05:30,52500,simulated
+PAY024,O015,Aster Wellness festival partnership,A014,Aster Wellness,balance,52500,2025-03-22T18:00:00+05:30,2025-04-16T15:00:00+05:30,52500,simulated
+PAY025,O016,Aster Threads festival partnership,A015,Aster Threads,advance,25000,2025-03-17T12:00:00+05:30,2025-03-11T15:00:00+05:30,25000,simulated
+PAY026,O016,Aster Threads festival partnership,A015,Aster Threads,balance,25000,2025-03-22T18:00:00+05:30,2025-03-17T15:00:00+05:30,25000,simulated
+PAY027,O017,Aster Works festival partnership,A016,Aster Works,advance,32500,2025-03-20T12:00:00+05:30,2025-03-19T15:00:00+05:30,32500,simulated
+PAY028,O017,Aster Works festival partnership,A016,Aster Works,balance,32500,2025-03-22T18:00:00+05:30,2025-03-30T15:00:00+05:30,32500,simulated
+PAY029,O018,Bramble Pantry festival partnership,A017,Bramble Pantry,advance,40000,2025-03-23T12:00:00+05:30,2025-04-05T15:00:00+05:30,40000,simulated
+PAY030,O018,Bramble Pantry festival partnership,A017,Bramble Pantry,balance,40000,2025-03-23T12:00:00+05:30,2025-04-05T15:00:00+05:30,40000,simulated
+PAY031,O019,Bramble Studio festival partnership,A018,Bramble Studio,advance,47500,2025-03-26T12:00:00+05:30,2025-03-22T15:00:00+05:30,47500,simulated
+PAY032,O019,Bramble Studio festival partnership,A018,Bramble Studio,balance,47500,2025-03-26T12:00:00+05:30,,0,simulated
+PAY033,O020,Bramble Devices festival partnership,A019,Bramble Devices,advance,55000,2025-03-29T12:00:00+05:30,,0,simulated
+PAY034,O020,Bramble Devices festival partnership,A019,Bramble Devices,balance,55000,2025-03-29T12:00:00+05:30,,0,simulated
+PAY035,O021,Bramble Active festival partnership,A020,Bramble Active,advance,62500,2025-04-01T12:00:00+05:30,2025-03-27T15:00:00+05:30,62500,simulated
+PAY036,O021,Bramble Active festival partnership,A020,Bramble Active,balance,62500,2025-04-01T12:00:00+05:30,2025-03-30T15:00:00+05:30,62500,simulated
+PAY037,O022,Bramble Learning festival partnership,A021,Bramble Learning,advance,45000,2025-04-04T12:00:00+05:30,2025-04-03T15:00:00+05:30,45000,simulated
+PAY038,O022,Bramble Learning festival partnership,A021,Bramble Learning,balance,45000,2025-04-04T12:00:00+05:30,2025-04-03T15:00:00+05:30,45000,simulated
+PAY039,O023,Bramble Living festival partnership,A022,Bramble Living,advance,52500,2025-04-07T12:00:00+05:30,2025-04-01T15:00:00+05:30,52500,simulated
+PAY040,O023,Bramble Living festival partnership,A022,Bramble Living,balance,52500,2025-04-07T12:00:00+05:30,2025-04-03T15:00:00+05:30,52500,simulated

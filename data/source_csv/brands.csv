@@ -1,0 +1,181 @@
+brand_name,industry,owner_name,created_at,brand_id,owner_id
+Bramble Pantry,Consumer products,Kabir Shah,2025-02-27T08:00:00+05:30,A017,T02
+Indigo Wellness,Mobility,Kabir Shah,2025-03-14T08:00:00+05:30,A094,T02
+Pebble Works,Education,Nisha Rao,2025-02-21T08:00:00+05:30,A166,T05
+Meadow Works,Education,Riya Kapoor,2025-03-08T08:00:00+05:30,A136,T01
+Cedar Learning,Education,Kabir Shah,2025-02-23T08:00:00+05:30,A031,T02
+Glow Collective,Media,Kabir Shah,2025-03-17T08:00:00+05:30,A073,T02
+Lumen Active,Food and beverage,Kabir Shah,2025-01-30T08:00:00+05:30,A120,T02
+Indigo Collective,Media,Kabir Shah,2025-03-07T08:00:00+05:30,A093,T02
+Olive Threads,Food and beverage,Kabir Shah,2025-02-19T08:00:00+05:30,A155,T02
+Indigo Studio,Media,Kabir Shah,2025-01-31T08:00:00+05:30,A088,T02
+Fable Active,Food and beverage,Kabir Shah,2025-03-01T08:00:00+05:30,A060,T02
+Nimble Studio,Media,Riya Kapoor,2025-03-22T08:00:00+05:30,A138,T01
+Hearth Devices,Mobility,Kabir Shah,2025-02-12T08:00:00+05:30,A079,T02
+Juniper Foods,Food and beverage,Nisha Rao,2025-01-15T08:00:00+05:30,A002,T05
+Nimble Wellness,Mobility,Riya Kapoor,2025-02-17T08:00:00+05:30,A144,T01
+Evergreen Learning,Education,Riya Kapoor,2025-03-13T08:00:00+05:30,A051,T01
+Glow Learning,Education,Kabir Shah,2025-03-03T08:00:00+05:30,A071,T02
+Cedar Collective,Media,Riya Kapoor,2025-01-21T08:00:00+05:30,A033,T01
+Juniper Threads,Food and beverage,Kabir Shah,2025-03-16T08:00:00+05:30,A105,T02
+Bramble Learning,Education,Riya Kapoor,2025-03-11T08:00:00+05:30,A021,T01
+Glow Pantry,Consumer products,Kabir Shah,2025-02-03T08:00:00+05:30,A067,T02
+Evergreen Wellness,Mobility,Riya Kapoor,2025-01-18T08:00:00+05:30,A054,T01
+Daybreak Works,Education,Kabir Shah,2025-02-06T08:00:00+05:30,A046,T02
+Glow Wellness,Mobility,Kabir Shah,2025-03-24T08:00:00+05:30,A074,T02
+Bramble Threads,Food and beverage,Nisha Rao,2025-02-09T08:00:00+05:30,A025,T05
+Willow Active,Food and beverage,Kabir Shah,2025-03-16T08:00:00+05:30,A180,T02
+Nimble Pantry,Consumer products,Riya Kapoor,2025-03-15T08:00:00+05:30,A137,T01
+Lumen Living,Consumer products,Kabir Shah,2025-02-13T08:00:00+05:30,A122,T02
+Aster Studio,Media,Kabir Shah,2025-01-31T08:00:00+05:30,A008,T02
+Cedar Active,Food and beverage,Riya Kapoor,2025-02-16T08:00:00+05:30,A030,T01
+Lumen Works,Education,Kabir Shah,2025-03-13T08:00:00+05:30,A126,T02
+Aster Devices,Mobility,Riya Kapoor,2025-02-03T08:00:00+05:30,A009,T01
+Aster Works,Education,Nisha Rao,2025-02-21T08:00:00+05:30,A016,T05
+Nimble Collective,Media,Riya Kapoor,2025-02-10T08:00:00+05:30,A143,T01
+Ripple Threads,Food and beverage,Kabir Shah,2025-02-09T08:00:00+05:30,A175,T02
+Ripple Devices,Mobility,Nisha Rao,2025-03-14T08:00:00+05:30,A169,T05
+Hearth Living,Consumer products,Kabir Shah,2025-03-05T08:00:00+05:30,A082,T02
+Kindred Wellness,Mobility,Kabir Shah,2025-03-04T08:00:00+05:30,A114,T02
+Aster Learning,Education,Kabir Shah,2025-01-17T08:00:00+05:30,A011,T02
+Lumen Threads,Food and beverage,Kabir Shah,2025-03-06T08:00:00+05:30,A125,T02
+Pebble Learning,Education,Nisha Rao,2025-01-17T08:00:00+05:30,A161,T05
+Daybreak Devices,Mobility,Riya Kapoor,2025-02-18T08:00:00+05:30,A039,T01
+Cedar Works,Education,Riya Kapoor,2025-01-28T08:00:00+05:30,A036,T01
+Olive Devices,Mobility,Riya Kapoor,2025-03-24T08:00:00+05:30,A149,T01
+Hearth Threads,Food and beverage,Kabir Shah,2025-03-26T08:00:00+05:30,A085,T02
+Nimble Devices,Mobility,Riya Kapoor,2025-03-29T08:00:00+05:30,A139,T01
+Pebble Active,Food and beverage,Kabir Shah,2025-03-26T08:00:00+05:30,A160,T02
+Lumen Learning,Education,Kabir Shah,2025-02-06T08:00:00+05:30,A121,T02
+Kindred Learning,Education,Kabir Shah,2025-02-11T08:00:00+05:30,A111,T02
+Hearth Pantry,Consumer products,Kabir Shah,2025-01-29T08:00:00+05:30,A077,T02
+Evergreen Pantry,Consumer products,Kabir Shah,2025-02-13T08:00:00+05:30,A047,T02
+Bramble Studio,Media,Riya Kapoor,2025-03-02T08:00:00+05:30,A018,T01
+Juniper Studio,Media,Kabir Shah,2025-01-26T08:00:00+05:30,A098,T02
+Daybreak Living,Consumer products,Riya Kapoor,2025-03-11T08:00:00+05:30,A042,T01
+Indigo Devices,Mobility,Kabir Shah,2025-02-07T08:00:00+05:30,A089,T02
+Fable Pantry,Consumer products,Riya Kapoor,2025-02-08T08:00:00+05:30,A057,T01
+Cedar Pantry,Consumer products,Riya Kapoor,2025-02-23T08:00:00+05:30,A027,T01
+Indigo Active,Food and beverage,Kabir Shah,2025-02-14T08:00:00+05:30,A090,T02
+Aster Threads,Food and beverage,Riya Kapoor,2025-02-14T08:00:00+05:30,A015,T01
+Hearth Studio,Media,Kabir Shah,2025-02-05T08:00:00+05:30,A078,T02
+Hearth Collective,Media,Kabir Shah,2025-03-12T08:00:00+05:30,A083,T02
+Meadow Learning,Education,Kabir Shah,2025-02-01T08:00:00+05:30,A131,T02
+Daybreak Active,Food and beverage,Kabir Shah,2025-02-25T08:00:00+05:30,A040,T02
+Ripple Studio,Media,Nisha Rao,2025-03-07T08:00:00+05:30,A168,T05
+Beardo,Personal care,Riya Kapoor,2025-03-03T08:00:00+05:30,A001,T01
+Evergreen Studio,Media,Riya Kapoor,2025-02-20T08:00:00+05:30,A048,T01
+Mosaic Mobility,Mobility,Kabir Shah,2025-01-15T08:00:00+05:30,A003,T02
+Kindred Active,Food and beverage,Kabir Shah,2025-02-04T08:00:00+05:30,A110,T02
+Juniper Learning,Education,Kabir Shah,2025-02-16T08:00:00+05:30,A101,T02
+Hearth Learning,Education,Kabir Shah,2025-02-26T08:00:00+05:30,A081,T02
+Daybreak Studio,Media,Kabir Shah,2025-02-11T08:00:00+05:30,A038,T02
+Lumen Devices,Mobility,Kabir Shah,2025-01-23T08:00:00+05:30,A119,T02
+Nimble Works,Education,Riya Kapoor,2025-03-03T08:00:00+05:30,A146,T01
+Glow Threads,Food and beverage,Kabir Shah,2025-01-15T08:00:00+05:30,A075,T02
+Glow Devices,Mobility,Kabir Shah,2025-02-17T08:00:00+05:30,A069,T02
+Juniper Works,Education,Kabir Shah,2025-03-23T08:00:00+05:30,A106,T02
+Ripple Active,Food and beverage,Nisha Rao,2025-03-21T08:00:00+05:30,A170,T05
+Aster Wellness,Mobility,Kabir Shah,2025-02-07T08:00:00+05:30,A014,T02
+Evergreen Threads,Food and beverage,Kabir Shah,2025-01-25T08:00:00+05:30,A055,T02
+Evergreen Works,Education,Kabir Shah,2025-02-01T08:00:00+05:30,A056,T02
+Daybreak Wellness,Mobility,Kabir Shah,2025-01-23T08:00:00+05:30,A044,T02
+Cedar Wellness,Mobility,Kabir Shah,2025-01-19T08:00:00+05:30,A034,T02
+Meadow Wellness,Mobility,Kabir Shah,2025-02-22T08:00:00+05:30,A134,T02
+Bramble Works,Education,Kabir Shah,2025-02-16T08:00:00+05:30,A026,T02
+Cedar Studio,Media,Kabir Shah,2025-02-02T08:00:00+05:30,A028,T02
+Nimble Living,Consumer products,Riya Kapoor,2025-02-03T08:00:00+05:30,A142,T01
+Lumen Wellness,Mobility,Kabir Shah,2025-02-27T08:00:00+05:30,A124,T02
+Juniper Pantry,Consumer products,Kabir Shah,2025-01-19T08:00:00+05:30,A097,T02
+Harbor Beverages,Food and beverage,Riya Kapoor,2025-01-15T08:00:00+05:30,A004,T01
+Juniper Living,Consumer products,Kabir Shah,2025-02-23T08:00:00+05:30,A102,T02
+Willow Pantry,Consumer products,Kabir Shah,2025-02-23T08:00:00+05:30,A177,T02
+Olive Studio,Media,Riya Kapoor,2025-03-17T08:00:00+05:30,A148,T01
+Pebble Threads,Food and beverage,Nisha Rao,2025-02-14T08:00:00+05:30,A165,T05
+Fable Wellness,Mobility,Kabir Shah,2025-03-29T08:00:00+05:30,A064,T02
+Hearth Wellness,Mobility,Kabir Shah,2025-03-19T08:00:00+05:30,A084,T02
+Olive Living,Consumer products,Kabir Shah,2025-01-29T08:00:00+05:30,A152,T02
+Bramble Devices,Mobility,Nisha Rao,2025-03-05T08:00:00+05:30,A019,T05
+Daybreak Threads,Food and beverage,Riya Kapoor,2025-01-30T08:00:00+05:30,A045,T01
+Kindred Devices,Mobility,Kabir Shah,2025-01-28T08:00:00+05:30,A109,T02
+Pebble Living,Consumer products,Nisha Rao,2025-01-24T08:00:00+05:30,A162,T05
+Indigo Pantry,Consumer products,Kabir Shah,2025-01-24T08:00:00+05:30,A087,T02
+Bramble Active,Food and beverage,Kabir Shah,2025-03-08T08:00:00+05:30,A020,T02
+Lumen Pantry,Consumer products,Kabir Shah,2025-03-25T08:00:00+05:30,A117,T02
+Aster Collective,Media,Nisha Rao,2025-01-31T08:00:00+05:30,A013,T05
+Bramble Wellness,Mobility,Riya Kapoor,2025-02-02T08:00:00+05:30,A024,T01
+Juniper Active,Food and beverage,Kabir Shah,2025-02-09T08:00:00+05:30,A100,T02
+Pebble Collective,Media,Nisha Rao,2025-01-31T08:00:00+05:30,A163,T05
+Meadow Living,Consumer products,Kabir Shah,2025-02-08T08:00:00+05:30,A132,T02
+Hearth Works,Education,Kabir Shah,2025-01-17T08:00:00+05:30,A086,T02
+Fable Threads,Food and beverage,Kabir Shah,2025-01-20T08:00:00+05:30,A065,T02
+Evergreen Collective,Media,Kabir Shah,2025-01-25T08:00:00+05:30,A053,T02
+Nimble Active,Food and beverage,Riya Kapoor,2025-01-20T08:00:00+05:30,A140,T01
+Fable Learning,Education,Kabir Shah,2025-03-08T08:00:00+05:30,A061,T02
+Willow Studio,Media,Kabir Shah,2025-03-02T08:00:00+05:30,A178,T02
+Ripple Works,Education,Kabir Shah,2025-02-16T08:00:00+05:30,A176,T02
+Olive Learning,Education,Kabir Shah,2025-01-22T08:00:00+05:30,A151,T02
+Cobalt Learning,Education,Riya Kapoor,2025-01-15T08:00:00+05:30,A005,T01
+Glow Works,Education,Kabir Shah,2025-01-22T08:00:00+05:30,A076,T02
+Fable Living,Consumer products,Kabir Shah,2025-03-15T08:00:00+05:30,A062,T02
+Juniper Wellness,Mobility,Kabir Shah,2025-03-09T08:00:00+05:30,A104,T02
+Ripple Living,Consumer products,Kabir Shah,2025-01-19T08:00:00+05:30,A172,T02
+Olive Pantry,Consumer products,Riya Kapoor,2025-03-10T08:00:00+05:30,A147,T01
+Daybreak Collective,Media,Kabir Shah,2025-01-16T08:00:00+05:30,A043,T02
+Pebble Devices,Mobility,Kabir Shah,2025-03-19T08:00:00+05:30,A159,T02
+Ripple Learning,Education,Kabir Shah,2025-03-28T08:00:00+05:30,A171,T02
+Ripple Collective,Media,Kabir Shah,2025-01-26T08:00:00+05:30,A173,T02
+Meadow Devices,Mobility,Kabir Shah,2025-01-18T08:00:00+05:30,A129,T02
+Glow Active,Food and beverage,Kabir Shah,2025-02-24T08:00:00+05:30,A070,T02
+Kindred Pantry,Consumer products,Kabir Shah,2025-03-30T08:00:00+05:30,A107,T02
+Kindred Living,Consumer products,Kabir Shah,2025-02-18T08:00:00+05:30,A112,T02
+Evergreen Devices,Mobility,Kabir Shah,2025-02-27T08:00:00+05:30,A049,T02
+Pebble Wellness,Mobility,Nisha Rao,2025-02-07T08:00:00+05:30,A164,T05
+Fable Works,Education,Kabir Shah,2025-01-27T08:00:00+05:30,A066,T02
+Maple Devices,Consumer products,Nisha Rao,2025-01-15T08:00:00+05:30,A006,T05
+Lumen Studio,Media,Kabir Shah,2025-01-16T08:00:00+05:30,A118,T02
+Olive Active,Food and beverage,Riya Kapoor,2025-01-15T08:00:00+05:30,A150,T01
+Meadow Collective,Media,Kabir Shah,2025-02-15T08:00:00+05:30,A133,T02
+Nimble Learning,Education,Riya Kapoor,2025-01-27T08:00:00+05:30,A141,T01
+Juniper Collective,Media,Kabir Shah,2025-03-02T08:00:00+05:30,A103,T02
+Indigo Works,Education,Kabir Shah,2025-03-28T08:00:00+05:30,A096,T02
+Ripple Wellness,Mobility,Kabir Shah,2025-02-02T08:00:00+05:30,A174,T02
+Cedar Devices,Mobility,Kabir Shah,2025-02-09T08:00:00+05:30,A029,T02
+Fable Devices,Mobility,Kabir Shah,2025-02-22T08:00:00+05:30,A059,T02
+Olive Collective,Media,Kabir Shah,2025-02-05T08:00:00+05:30,A153,T02
+Evergreen Active,Food and beverage,Kabir Shah,2025-03-06T08:00:00+05:30,A050,T02
+Fable Collective,Media,Kabir Shah,2025-03-22T08:00:00+05:30,A063,T02
+Pebble Studio,Media,Kabir Shah,2025-03-12T08:00:00+05:30,A158,T02
+Fable Studio,Media,Kabir Shah,2025-02-15T08:00:00+05:30,A058,T02
+Cedar Living,Consumer products,Kabir Shah,2025-03-02T08:00:00+05:30,A032,T02
+Meadow Pantry,Consumer products,Kabir Shah,2025-03-20T08:00:00+05:30,A127,T02
+Indigo Threads,Food and beverage,Kabir Shah,2025-03-21T08:00:00+05:30,A095,T02
+Evergreen Living,Consumer products,Kabir Shah,2025-01-19T08:00:00+05:30,A052,T02
+Indigo Learning,Education,Kabir Shah,2025-02-21T08:00:00+05:30,A091,T02
+Kindred Threads,Food and beverage,Kabir Shah,2025-03-11T08:00:00+05:30,A115,T02
+Meadow Active,Food and beverage,Kabir Shah,2025-01-25T08:00:00+05:30,A130,T02
+Pebble Pantry,Consumer products,Kabir Shah,2025-03-05T08:00:00+05:30,A157,T02
+Meadow Studio,Media,Kabir Shah,2025-03-27T08:00:00+05:30,A128,T02
+Aster Active,Food and beverage,Nisha Rao,2025-02-06T08:00:00+05:30,A010,T05
+Hearth Active,Food and beverage,Kabir Shah,2025-02-19T08:00:00+05:30,A080,T02
+Bramble Collective,Media,Kabir Shah,2025-01-26T08:00:00+05:30,A023,T02
+Lumen Collective,Media,Kabir Shah,2025-02-20T08:00:00+05:30,A123,T02
+Daybreak Learning,Education,Kabir Shah,2025-03-04T08:00:00+05:30,A041,T02
+Aster Living,Consumer products,Riya Kapoor,2025-01-24T08:00:00+05:30,A012,T01
+Bramble Living,Consumer products,Nisha Rao,2025-01-19T08:00:00+05:30,A022,T05
+Olive Works,Education,Kabir Shah,2025-02-26T08:00:00+05:30,A156,T02
+Kindred Collective,Media,Kabir Shah,2025-02-25T08:00:00+05:30,A113,T02
+Kindred Studio,Media,Kabir Shah,2025-01-21T08:00:00+05:30,A108,T02
+Cedar Threads,Food and beverage,Kabir Shah,2025-01-21T08:00:00+05:30,A035,T02
+Kindred Works,Education,Kabir Shah,2025-03-18T08:00:00+05:30,A116,T02
+Indigo Living,Consumer products,Kabir Shah,2025-02-28T08:00:00+05:30,A092,T02
+Juniper Devices,Mobility,Kabir Shah,2025-02-02T08:00:00+05:30,A099,T02
+Meadow Threads,Food and beverage,Kabir Shah,2025-03-01T08:00:00+05:30,A135,T02
+Glow Living,Consumer products,Kabir Shah,2025-03-10T08:00:00+05:30,A072,T02
+Aster Pantry,Consumer products,Nisha Rao,2025-01-28T08:00:00+05:30,A007,T05
+Glow Studio,Media,Kabir Shah,2025-02-10T08:00:00+05:30,A068,T02
+Nimble Threads,Food and beverage,Riya Kapoor,2025-02-24T08:00:00+05:30,A145,T01
+Willow Devices,Mobility,Kabir Shah,2025-03-09T08:00:00+05:30,A179,T02
+Olive Wellness,Mobility,Kabir Shah,2025-02-12T08:00:00+05:30,A154,T02
+Daybreak Pantry,Consumer products,Kabir Shah,2025-02-04T08:00:00+05:30,A037,T02
+Ripple Pantry,Consumer products,Nisha Rao,2025-02-28T08:00:00+05:30,A167,T05

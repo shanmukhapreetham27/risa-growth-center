@@ -1,0 +1,7 @@
+task_id,title,sponsor_campaign_id,opportunity_id,brand_id,owner_id,owner_name,due_date,status,notes,created_at,source
+TSK001,Send renewal proposal to Beardo,SC02,O001,A001,T01,Riya Kapoor,2025-04-25,open,Renewal for next edition,2025-03-15T10:00:00+05:30,simulated
+TSK002,Chase overdue balance invoices before festival,,,,T02,Kabir Shah,2025-04-08,open,Collections,2025-03-15T10:00:00+05:30,simulated
+TSK003,Review stale negotiating deals from LinkedIn,SC03,,,T01,Riya Kapoor,2025-03-28,open,Stale pipeline,2025-03-15T10:00:00+05:30,simulated
+TSK004,Ask confirmed partners for two brand introductions each,SC02,,,T05,Nisha Rao,2025-03-20,done,Referral engine,2025-03-15T10:00:00+05:30,simulated
+TSK005,Pause Brand Discovery Email sends pending review,SC01,,,T02,Kabir Shah,2025-03-25,open,Channel review,2025-03-15T10:00:00+05:30,simulated
+TSK006,Prepare sponsor recap report template,,,,T03,Meera Iyer,2025-04-18,open,Post-event reporting,2025-03-15T10:00:00+05:30,simulated

@@ -1,0 +1,150 @@
+{
+ "base": {
+  "rows": [
+   {
+    "engine": "A Renewal and upsell desk",
+    "prospects": 24,
+    "conversations": 21.6,
+    "proposals": 18.4,
+    "signed": 11.9,
+    "avg_deal": 95000,
+    "signed_value": 1133730,
+    "collect_rate": 0.92,
+    "cash": 1043032
+   },
+   {
+    "engine": "B Warm intro engine",
+    "prospects": 50,
+    "conversations": 40.0,
+    "proposals": 26.0,
+    "signed": 13.0,
+    "avg_deal": 90000,
+    "signed_value": 1170000,
+    "collect_rate": 0.92,
+    "cash": 1076400
+   },
+   {
+    "engine": "C Near miss reactivation",
+    "prospects": 26,
+    "conversations": 13.0,
+    "proposals": 9.1,
+    "signed": 2.3,
+    "avg_deal": 55000,
+    "signed_value": 125125,
+    "collect_rate": 0.92,
+    "cash": 115115
+   },
+   {
+    "engine": "D Anchor partner ABM",
+    "prospects": 12,
+    "conversations": 4.8,
+    "proposals": 2.9,
+    "signed": 0.9,
+    "avg_deal": 350000,
+    "signed_value": 302400,
+    "collect_rate": 0.7,
+    "cash": 211680
+   }
+  ],
+  "total": {
+   "prospects": 112,
+   "conversations": 79.4,
+   "proposals": 56.3,
+   "signed": 28.1,
+   "signed_value": 2731255.0,
+   "cash": 2446226.6,
+   "cash_no_policy": 2124524.0
+  }
+ },
+ "stretch": {
+  "rows": [
+   {
+    "engine": "A Renewal and upsell desk",
+    "prospects": 24,
+    "conversations": 22.8,
+    "proposals": 20.5,
+    "signed": 15.4,
+    "avg_deal": 120000,
+    "signed_value": 1846800,
+    "collect_rate": 0.96,
+    "cash": 1772928
+   },
+   {
+    "engine": "B Warm intro engine",
+    "prospects": 70,
+    "conversations": 57.4,
+    "proposals": 40.2,
+    "signed": 26.1,
+    "avg_deal": 95000,
+    "signed_value": 2481115,
+    "collect_rate": 0.96,
+    "cash": 2381870
+   },
+   {
+    "engine": "C Near miss reactivation",
+    "prospects": 40,
+    "conversations": 24.0,
+    "proposals": 18.0,
+    "signed": 7.2,
+    "avg_deal": 60000,
+    "signed_value": 432000,
+    "collect_rate": 0.96,
+    "cash": 414720
+   },
+   {
+    "engine": "D Anchor partner ABM",
+    "prospects": 15,
+    "conversations": 7.5,
+    "proposals": 5.2,
+    "signed": 2.1,
+    "avg_deal": 400000,
+    "signed_value": 840000,
+    "collect_rate": 0.85,
+    "cash": 714000
+   }
+  ],
+  "total": {
+   "prospects": 149,
+   "conversations": 111.7,
+   "proposals": 84.0,
+   "signed": 50.8,
+   "signed_value": 5599915.0,
+   "cash": 5283518.4,
+   "cash_no_policy": 4311932.0
+  }
+ },
+ "inventory": [
+  [
+   "Presenting partner",
+   1,
+   600000
+  ],
+  [
+   "Category exclusive partner",
+   4,
+   300000
+  ],
+  [
+   "Zone partner",
+   8,
+   150000
+  ],
+  [
+   "Experience partner",
+   25,
+   90000
+  ],
+  [
+   "Sampling partner",
+   25,
+   40000
+  ]
+ ],
+ "rice": {
+  "A": 2.09,
+  "B": 0.32,
+  "C": 0.19,
+  "D": 0.08,
+  "E": 0.75
+ }
+}

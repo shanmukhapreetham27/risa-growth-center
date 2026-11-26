@@ -1,0 +1,86 @@
+[
+ {
+  "id": "Q01",
+  "q": "How many confirmed partnerships do we have and how does that compare with the goal?",
+  "expect": "24 confirmed (latest stage partner_confirmed) vs goal 28 from \"Sponsor revised plan\" (effective 15 Mar 2025); 4 short. As of 20 Apr 2025.",
+  "type": "fact"
+ },
+ {
+  "id": "Q02",
+  "q": "Which campaign brought in the most confirmed cash?",
+  "expect": "Creator Network Referrals: ₹7,25,000 cash from 9 confirmed. Note Warm Partner Introductions ties on total confirmed value (₹7,85,000 each) once in kind is included.",
+  "type": "calc"
+ },
+ {
+  "id": "Q03",
+  "q": "Why are we behind on partnerships?",
+  "expect": "Cold channels (Brand Discovery Email, Brand Leader LinkedIn, Past Conversation Revival) created 33 opportunities and 0 confirmed; all 26 open opportunities are stale (no stage update in over 7 days). Warm channels converted 24 of 25. Must separate evidence from assumption (no loss reasons in data).",
+  "type": "diagnosis"
+ },
+ {
+  "id": "Q04",
+  "q": "Of those stuck deals, which are worth the most?",
+  "expect": "Follow up to Q03. Top open by proposed value: Cedar Pantry festival partnership (negotiating, ₹110,000, Riya Kapoor); Evergreen Living festival partnership (negotiating, ₹90,000, Nisha Rao); Evergreen Pantry festival partnership (negotiating, ₹90,000, Riya Kapoor); Fable Pantry festival partnership (negotiating, ₹90,000, Meera Iyer); Daybreak Living festival partnership (negotiating, ₹90,000, Meera Iyer). Note: Cedar Pantry is highest at ₹1,10,000; six deals tie at ₹90,000, so the answer should state the tie.",
+  "type": "follow_up"
+ },
+ {
+  "id": "Q05",
+  "q": "How many partnerships were confirmed as of 10 March 2025?",
+  "expect": "15 confirmed, ₹1,260,000 cash. Includes Cobalt Learning (confirmed 25 Feb, withdrawn 20 Mar). Goal in force then: 20 (launch plan).",
+  "type": "snapshot"
+ },
+ {
+  "id": "Q06",
+  "q": "How much cash have we actually collected?",
+  "expect": "Simulated payments: ₹1,842,500 collected by 20 Apr; ₹1,790,000 before the festival started; ₹157,500 outstanding across 3 overdue installments. Must say payment data is simulated, source has no bank receipts.",
+  "type": "calc_caveat"
+ },
+ {
+  "id": "Q07",
+  "q": "Why did Cobalt Learning withdraw?",
+  "expect": "Data cannot answer: the source records the stage change to withdrawn on 20 Mar 2025 but no reason field exists. Offer next step (task to ask owner).",
+  "type": "cannot_answer"
+ },
+ {
+  "id": "Q08",
+  "q": "Did Beardo's sponsorship increase festival attendance?",
+  "expect": "Data cannot answer: sponsor_activations only records an association with the Creator Partners attendee campaign and explicitly does not establish incremental visitor impact.",
+  "type": "cannot_answer"
+ },
+ {
+  "id": "Q09",
+  "q": "What is the average confirmed deal size for Food and beverage brands?",
+  "expect": "6 confirmed, ₹550,000 total, average ₹91,667.",
+  "type": "calc"
+ },
+ {
+  "id": "Q10",
+  "q": "What is our cost per confirmed partnership by campaign?",
+  "expect": "Budgets/spend are simulated (source has no spend). Cold campaigns have spend but 0 confirmed, so cost per partnership is undefined, not zero. Must caveat.",
+  "type": "calc_caveat"
+ },
+ {
+  "id": "Q11",
+  "q": "Create a task for Riya to follow up the three most valuable negotiating deals by 25 April.",
+  "expect": "Proposes a task (owner Riya Kapoor T01, due 2025-04-25, linked opportunities) and waits for explicit Confirm before writing. Negotiating deals: Cedar Pantry festival partnership ₹110,000; Evergreen Living festival partnership ₹90,000; Evergreen Pantry festival partnership ₹90,000; Fable Pantry festival partnership ₹90,000; Daybreak Living festival partnership ₹90,000; Cedar Living festival partnership ₹90,000; Daybreak Pantry festival partnership ₹90,000; Bramble Works festival partnership ₹70,000. Only Cedar Pantry is uniquely in the top 3; six tie at ₹90,000, so the copilot must flag the tie and ask or state a tie-break rule before proposing.",
+  "type": "action"
+ },
+ {
+  "id": "Q12",
+  "q": "Which overdue payments should we chase first?",
+  "expect": "Simulated: Bramble Studio balance ₹47,500 due 2025-03-26; Bramble Devices advance ₹55,000 due 2025-03-29; Bramble Devices balance ₹55,000 due 2025-03-29",
+  "type": "calc_caveat"
+ },
+ {
+  "id": "Q13",
+  "q": "What will our sponsorship revenue be next year?",
+  "expect": "Cannot forecast next year from this data; can show current weighted pipeline (assumption based stage weights) and point to strategy assumptions. Must not invent.",
+  "type": "cannot_answer"
+ },
+ {
+  "id": "Q14",
+  "q": "[after editing an opportunity in the UI to partner_confirmed] How many confirmed partnerships now?",
+  "expect": "Reflects the edit immediately (e.g. 25), stamped at the simulation date, and earlier snapshots unchanged.",
+  "type": "changed_data"
+ }
+]

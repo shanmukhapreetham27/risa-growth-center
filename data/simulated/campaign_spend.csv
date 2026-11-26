@@ -1,0 +1,25 @@
+spend_id,sponsor_campaign_id,campaign_name,spent_at,amount_inr,note,source
+SP001,SC01,Brand Discovery Email,2025-01-31T18:00:00+05:30,6000,Monthly posted spend,simulated
+SP002,SC01,Brand Discovery Email,2025-02-28T18:00:00+05:30,10500,Monthly posted spend,simulated
+SP003,SC01,Brand Discovery Email,2025-03-31T18:00:00+05:30,10500,Monthly posted spend,simulated
+SP004,SC01,Brand Discovery Email,2025-04-10T18:00:00+05:30,3000,Monthly posted spend,simulated
+SP005,SC02,Warm Partner Introductions,2025-01-31T18:00:00+05:30,1800,Monthly posted spend,simulated
+SP006,SC02,Warm Partner Introductions,2025-02-28T18:00:00+05:30,3200,Monthly posted spend,simulated
+SP007,SC02,Warm Partner Introductions,2025-03-31T18:00:00+05:30,3200,Monthly posted spend,simulated
+SP008,SC02,Warm Partner Introductions,2025-04-10T18:00:00+05:30,900,Monthly posted spend,simulated
+SP009,SC03,Brand Leader LinkedIn,2025-01-31T18:00:00+05:30,5000,Monthly posted spend,simulated
+SP010,SC03,Brand Leader LinkedIn,2025-02-28T18:00:00+05:30,8800,Monthly posted spend,simulated
+SP011,SC03,Brand Leader LinkedIn,2025-03-31T18:00:00+05:30,8800,Monthly posted spend,simulated
+SP012,SC03,Brand Leader LinkedIn,2025-04-10T18:00:00+05:30,2500,Monthly posted spend,simulated
+SP013,SC04,Partner Interest Form,2025-01-31T18:00:00+05:30,1200,Monthly posted spend,simulated
+SP014,SC04,Partner Interest Form,2025-02-28T18:00:00+05:30,2100,Monthly posted spend,simulated
+SP015,SC04,Partner Interest Form,2025-03-31T18:00:00+05:30,2100,Monthly posted spend,simulated
+SP016,SC04,Partner Interest Form,2025-04-10T18:00:00+05:30,600,Monthly posted spend,simulated
+SP017,SC05,Creator Network Referrals,2025-01-31T18:00:00+05:30,8800,Monthly posted spend,simulated
+SP018,SC05,Creator Network Referrals,2025-02-28T18:00:00+05:30,15400,Monthly posted spend,simulated
+SP019,SC05,Creator Network Referrals,2025-03-31T18:00:00+05:30,15400,Monthly posted spend,simulated
+SP020,SC05,Creator Network Referrals,2025-04-10T18:00:00+05:30,4400,Monthly posted spend,simulated
+SP021,SC06,Past Conversation Revival,2025-01-31T18:00:00+05:30,800,Monthly posted spend,simulated
+SP022,SC06,Past Conversation Revival,2025-02-28T18:00:00+05:30,1400,Monthly posted spend,simulated
+SP023,SC06,Past Conversation Revival,2025-03-31T18:00:00+05:30,1400,Monthly posted spend,simulated
+SP024,SC06,Past Conversation Revival,2025-04-10T18:00:00+05:30,400,Monthly posted spend,simulated
