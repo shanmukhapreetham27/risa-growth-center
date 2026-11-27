@@ -6,6 +6,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { type ChatEvent, runChat } from "@/lib/copilot/chat";
+import { takeDailySlot } from "@/lib/server/daily-cap";
 import { clientIp, takeChatSlot } from "@/lib/server/rate-limit";
 import { getReadonlySql, getSql } from "@/lib/server/db";
 
@@ -27,6 +28,23 @@ export async function POST(req: Request) {
   const slot = takeChatSlot(clientIp(req.headers));
   if (!slot.ok)
     return Response.json({ type: "error", message: `Limit reached: 30 copilot requests per hour. Try again in about ${Math.ceil(slot.retryAfterS / 60)} minutes.` }, { status: 429, headers: { "Retry-After": String(slot.retryAfterS) } });
+
+  // Global cap: 300 requests per IST day for everyone together (REVIEWER NOTE 06 P1).
+  let daily;
+  try {
+    daily = await takeDailySlot(getSql());
+  } catch (e) {
+    console.error("[copilot] daily cap check failed", e instanceof Error ? e.message : e);
+    return Response.json({ type: "error", message: "The copilot could not check its daily usage limit, so it is not answering right now. Try again shortly." }, { status: 503 });
+  }
+  if (!daily.ok) {
+    const h = Math.floor(daily.resetInS / 3600);
+    const m = Math.ceil((daily.resetInS % 3600) / 60);
+    return Response.json(
+      { type: "error", message: `The copilot has answered its ${daily.limit} questions for today, the limit shared by everyone using this demo. It resets at midnight India time (IST), in about ${h ? `${h} h ` : ""}${m} min. All pages still work without it.` },
+      { status: 429, headers: { "Retry-After": String(daily.resetInS) } },
+    );
+  }
 
   let messages: Anthropic.MessageParam[];
   try {

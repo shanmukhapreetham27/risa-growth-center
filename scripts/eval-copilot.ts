@@ -3,7 +3,11 @@
  * on the Neon test branch only (guarded), one question at a time:
  *   reset test branch (simulation date 2025-04-20) → Q01..Q13 (Q04 continues Q03's conversation, the
  *   others start fresh) → apply the Q14 edit through the write module (O028 → partner_confirmed, actor
- *   user) → Q14. Proposals are never confirmed by the harness.
+ *   user) → Q14 → Q15..Q19 → set stale days to 45 through the write module → Q20. Proposals are never
+ *   confirmed by the harness.
+ * Mechanical checks (REVIEWER NOTE 06): Q15 to Q20 carry an auto_check whose expected ids and numbers are
+ * computed from the engine at run time and graded by exact match (V1); every answer's ids and the numbers
+ * next to them are checked against the engine, and any mismatch fails the answer (V2).
  * Saves eval/results/<timestamp>.md (transcripts) and .json (raw numbers) after every question, so a run
  * that stops early keeps what it has. Not part of CI.
  *   npx tsx scripts/eval-copilot.ts [--only=Q01,Q03]
@@ -16,13 +20,17 @@ import { makeSql } from "../lib/db/client";
 import { assertTestDatabase } from "../lib/db/guard";
 import { resetDatabase } from "../lib/db/reset";
 import { loadEnv } from "../lib/env";
-import { changeOpportunity } from "../lib/writes";
+import { type AutoCheckSpec, type AutoResult, expectedFor, gradeAuto, idNumberMismatches } from "../lib/copilot/eval-checks";
+import { toolResults } from "../lib/copilot/grounding";
+import { loadDataset } from "../lib/engine";
+import { changeOpportunity, updateSettings } from "../lib/writes";
 
 interface Q {
   id: string;
   q: string;
   expect: string;
   type: string;
+  auto_check?: AutoCheckSpec;
 }
 
 interface Row {
@@ -39,7 +47,14 @@ interface Row {
   stop_reason: string | null;
   cost_usd: number;
   harness_notes: string[];
+  /** V1: exact match on ids and numbers (Q15 to Q20 only) */
+  auto: AutoResult | null;
+  /** V2: ids with a number next to them that the engine does not have for that record */
+  id_number_mismatches: string[];
+  grounding: { asked_to_recompute: string[] | null; final_unverified: string[]; proposals_refused: string[] };
 }
+
+const mech = (r: Row) => `${r.auto ? (r.auto.pass ? "PASS" : "FAIL") : "-"} | ${r.id_number_mismatches.length ? `FAIL (${r.id_number_mismatches.join("; ")})` : "ok"}`;
 
 const toolList = (t: ToolCallRecord[]) => t.map((c) => c.name).join(", ") || "none";
 
@@ -59,14 +74,18 @@ function writeResults(started: Date, rows: Row[], failure: string | null): strin
     "",
     `Totals: ${rows.length} questions, ${total.s.toFixed(1)} s, input ${total.input}, output ${total.output}, cache read ${total.read}, cache write ${total.write} tokens, cost $${total.cost.toFixed(4)} (Sonnet 5.5 list prices: $2 input, $10 output, $2.50 cache write, $0.10 cache read per million tokens).`,
     "",
-    "| Q | Type | Tools called | Latency s | Input | Output | Cache read | Cache write | Cost USD |",
-    "|---|---|---|---|---|---|---|---|---|",
-    ...rows.map((r) => `| ${r.id} | ${r.type} | ${toolList(r.tools)} | ${r.latency_s} | ${r.usage.input_tokens} | ${r.usage.output_tokens} | ${r.usage.cache_read_input_tokens} | ${r.usage.cache_creation_input_tokens} | ${r.cost_usd.toFixed(4)} |`),
+    `Mechanical checks: auto checks passed ${rows.filter((r) => r.auto?.pass).length} of ${rows.filter((r) => r.auto).length}; answers with an id-number mismatch (V2): ${rows.filter((r) => r.id_number_mismatches.length).length}.`,
+    "",
+    "| Q | Type | Tools called | Latency s | Input | Output | Cache read | Cache write | Cost USD | Auto check (V1) | Id-number check (V2) |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
+    ...rows.map((r) => `| ${r.id} | ${r.type} | ${toolList(r.tools)} | ${r.latency_s} | ${r.usage.input_tokens} | ${r.usage.output_tokens} | ${r.usage.cache_read_input_tokens} | ${r.usage.cache_creation_input_tokens} | ${r.cost_usd.toFixed(4)} | ${mech(r)} |`),
     "",
   ];
   for (const r of rows) {
     md.push(`## ${r.id} (${r.type})`, "", `**Question:** ${r.question}`, "", `**Expected:** ${r.expect}`, "");
     for (const n of r.harness_notes) md.push(`_Harness: ${n}_`, "");
+    if (r.auto) md.push(`**Auto check (V1):** ${r.auto.pass ? "PASS" : "FAIL"}; engine expects ${r.auto.expected}${r.auto.problems.length ? `; problems: ${r.auto.problems.join(", ")}` : ""}`, "");
+    md.push(`**Id-number check (V2):** ${r.id_number_mismatches.length ? `FAIL: ${r.id_number_mismatches.join("; ")}` : "no mismatch"}`, "");
     md.push("**Answer:**", "", r.answer || "(no text)", "");
     if (r.notice) md.push(`_Notice: ${r.notice}_`, "");
     md.push("**Tool calls:**", "", ...r.tools.map((t) => `- \`${t.name}\` ${JSON.stringify(t.input)} → ${t.ok ? "" : "ERROR "}${t.summary}`), "");
@@ -94,11 +113,15 @@ async function main() {
       if (only && !only.includes(q.id)) continue;
       const notes: string[] = [];
       if (q.id !== "Q04") history = [];
-      let text = q.q;
+      const text = q.q.replace(/^\[[^\]]*\]\s*/, "");
       if (q.id === "Q14") {
         const edit = await changeOpportunity(sql, { opportunity_id: "O028", stage: "partner_confirmed" }, "user");
         notes.push(`Before asking: O028 Cedar Pantry set to partner_confirmed through lib/writes (${edit.history_id}, effective ${new Date(edit.effective_at).toISOString()}), as the UI edit would.`);
-        text = q.q.replace(/^\[[^\]]*\]\s*/, "");
+      }
+      const staleDays = q.auto_check?.setup?.stale_days;
+      if (staleDays !== undefined) {
+        await updateSettings(sql, { stale_days: staleDays }, "user");
+        notes.push(`Before asking: stale days set to ${staleDays} through lib/writes (updateSettings, actor user), as the Settings form would.`);
       }
       if (q.id === "Q04") notes.push("Asked in the same conversation as Q03 (follow up).");
       const tasksBefore = (await sql<{ n: number }[]>`select count(*)::int n from tasks`)[0].n;
@@ -113,9 +136,13 @@ async function main() {
       notes.push(`Writes by the copilot during this question: tasks ${tasksAfter - tasksBefore}, audit rows ${auditAfter - auditBefore}.`);
       notes.push(
         res.grounding.asked_to_recompute
-          ? `Grounding check: first answer had untraced numbers (${res.grounding.asked_to_recompute.join(", ")}); model was asked once to recompute or remove them. Untraced in the final answer: ${res.grounding.final_unverified.join(", ") || "none"}.`
-          : "Grounding check: every number in the first answer traced to a tool or calculate result.",
+          ? `Grounding check: first answer had problems (${res.grounding.asked_to_recompute.join(", ")}); the model was asked once to fix them. Left in the final answer: ${res.grounding.final_unverified.join(", ") || "none"}.`
+          : "Grounding check: the first answer passed (numbers, ids, names, counts, ranges).",
       );
+      if (res.grounding.proposals_refused.length) notes.push(`Proposals refused by the grounding check before a card was shown: ${res.grounding.proposals_refused.join(" || ")}.`);
+      const data = await loadDataset(sql);
+      const auto = q.auto_check ? gradeAuto(res.text, expectedFor(q.auto_check, data)) : null;
+      const mismatches = idNumberMismatches(res.text, data, res.tool_calls, toolResults(history));
       const row: Row = {
         id: q.id,
         type: q.type,
@@ -130,10 +157,13 @@ async function main() {
         stop_reason: res.stop_reason,
         cost_usd: costUsd(res.usage),
         harness_notes: notes,
+        auto,
+        id_number_mismatches: mismatches,
+        grounding: res.grounding,
       };
       rows.push(row);
       writeResults(started, rows, null);
-      console.log(`${row.latency_s}s tools=[${toolList(res.tool_calls)}] in=${res.usage.input_tokens} out=${res.usage.output_tokens} cache_read=${res.usage.cache_read_input_tokens} cost=$${row.cost_usd.toFixed(4)}`);
+      console.log(`${row.latency_s}s tools=[${toolList(res.tool_calls)}] in=${res.usage.input_tokens} out=${res.usage.output_tokens} cache_read=${res.usage.cache_read_input_tokens} cost=$${row.cost_usd.toFixed(4)} auto=${auto ? (auto.pass ? "PASS" : `FAIL ${auto.problems.join(",")}`) : "-"} v2=${mismatches.length ? `FAIL ${mismatches.join(";")}` : "ok"}`);
     }
     console.log(`[eval] saved ${writeResults(started, rows, null)}`);
   } catch (e) {

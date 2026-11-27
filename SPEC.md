@@ -40,7 +40,7 @@ Out of scope: auth, multi tenancy, email sending, real payment integration, mobi
   - `campaign_budgets.csv`, `campaign_spend.csv`: planned budget and monthly posted spend per sponsor campaign.
   - `tasks.csv`: six seed tasks.
 - `reference_metrics.json`: ground truth numbers your metric engine must reproduce exactly (§7).
-- `copilot_eval_questions.json`: 14 copilot test questions with expected answers.
+- `copilot_eval_questions.json`: 20 copilot test questions with expected answers (Q15 to Q20 appended by REVIEWER NOTE 06 V1, each with an `auto_check` graded mechanically, §7).
 
 ### 2.2 Schema
 
@@ -171,18 +171,20 @@ Expected on 20 Apr and 15 Mar 2025: SC01 STOP, SC02 SCALE, SC03 CHANGE, SC04 SCA
 ## 6. Copilot
 
 ### 6.1 Architecture
-`/api/chat` route. Client sends the full message history each turn (follow ups must work). Server runs the Messages API tool use loop: call the model with the system prompt, the tool definitions and the history; while `stop_reason` is `tool_use`, execute every `tool_use` block, append one user turn containing the matching `tool_result` blocks (by `tool_use_id`), and call again (max 6 rounds). Then return the final text plus a list of the tool calls made (shown collapsed under each answer as "Data used"). Set a sensible `max_tokens`. Retry with backoff on 429 and 529 and show a clear message if it still fails. Mark the system prompt and tool definitions with prompt caching (`cache_control`) to cut cost. Cost guard: limit `/api/chat` to 30 requests per hour per IP (in memory is fine) and log token usage per request to the server console.
+`/api/chat` route. Client sends the full message history each turn (follow ups must work). Server runs the Messages API tool use loop: call the model with the system prompt, the tool definitions and the history; while `stop_reason` is `tool_use`, execute every `tool_use` block, append one user turn containing the matching `tool_result` blocks (by `tool_use_id`), and call again (max 6 rounds). Then return the final text plus a list of the tool calls made (shown collapsed under each answer as "Data used"). Set a sensible `max_tokens`. Retry with backoff on 429 and 529 and show a clear message if it still fails. Mark the system prompt and tool definitions with prompt caching (`cache_control`) to cut cost. Cost guard: limit `/api/chat` to 30 requests per hour per IP (in memory is fine) and log token usage per request to the server console. Global cap (REVIEWER NOTE 06 P1): at most 300 `/api/chat` requests per day across all users, counted in the database (table `copilot_usage`, one row per IST day, so it resets at midnight IST; Reset to original data keeps it), with a friendly message when reached.
+Grounding check (REVIEWER NOTE 06 E2 to E4): every final answer and every proposal's title, notes or reason is checked before the user sees it. Numbers must trace to a tool or `calculate` result; every opportunity, campaign, installment or task id must appear in a tool result and the name beside it must be that id's record; a deal or campaign named without its id is reported; small whole numbers and number words that count items, and ranges, must come from a tool result or `calculate` call made for this answer. A failing answer goes back to the model once (one extra model call on top of the 6 tool rounds); anything left is shown to the user as a notice. A failing proposal is not created; the model gets an error saying why.
 
 ### 6.2 Tools (all reads take optional `as_of`, default = simulation date)
 - `get_overview(as_of)`: all §3 metrics + targets.
 - `get_funnel(as_of, group_by?: campaign|channel_group|owner|industry, campaign_id?)`
 - `compare_snapshots(date_a, date_b)`
-- `list_opportunities(as_of, stage?, campaign_id?, owner_id?, stale_only?, min_value?, sort?, limit?)`: ordered with the §4 tie break; the result says which items tie
+- `list_opportunities(as_of, stage?, campaign_id?, owner_id?, opportunity_ids?, stale_only?, days_since_update_over?, min_value?, sort?, limit?)`: ordered with the §4 tie break; the result says which items tie
 - `get_opportunity_history(opportunity_id | name)`
 - `get_campaign_decisions(as_of)`: badges + metrics + rule fired
-- `get_collections(as_of, status?: paid|due|overdue|upcoming|all)`
+- `get_collections(as_of, status?: paid|due|overdue|upcoming|all, opportunity_id?, limit?)`
 - `get_budgets(as_of)`
-- `list_tasks(status?, owner_id?, overdue_only?)`
+- `list_tasks(status?, owner_id?, overdue_only?, limit?)`
+- List tools (`list_opportunities`, `get_collections`, `list_tasks`, REVIEWER NOTE 06 E1) return every matching row up to 200 by default, plus `total_matching`, `returned`, `truncated` and a `summary` over ALL matching rows: count, total proposed and confirmed value (amounts for installments), highest value item, oldest and newest last update (due dates for installments and tasks), each with id, name and days and the ids tied with it, min and max ranges, and counts by stage, owner and campaign.
 - `query_data(sql)`: read only SELECT against `v_*` views only, through `DATABASE_URL_READONLY` (role `risa_readonly`, SELECT on views only; tests use `DATABASE_URL_READONLY_TEST`), `statement_timeout` 3s, auto `LIMIT 200`, reject anything that is not a single SELECT. For long tail questions the fixed tools do not cover.
 - `calculate(expression)`: safe math (mathjs). Every number the model derives must go through this.
 - `data_dictionary()`: tables, fields (including the source `field_guide` rows), which are sourced / simulated / assumption, and the gaps list (§6.4).
@@ -201,6 +203,9 @@ Propose tools only insert a `chat_proposals` row (status pending) and return it.
 7. For actions, call a propose tool and wait for the user's confirmation.
 8. Be concise. Use a small table when comparing more than three items. INR with Indian grouping.
 9. Only discuss this festival's sponsorship data and plan; politely decline unrelated requests.
+10. (REVIEWER NOTE 06 E1, E3) Claims about all, total, oldest, newest, largest, smallest or a count must come from a list tool's summary or an untruncated result; if a result is truncated, say so or query again. Counts, ranges and subset statements must come from `calculate` or a tool summary.
+11. (E2) Every answer and proposal that names an opportunity, campaign, installment or task includes its id, for example "O036 Cedar Threads".
+12. (E5) Absence of a record is not evidence: say "the data has no later qualification change", never "so it was not a fit problem".
 
 ### 6.4 Gaps the copilot must recognise (also shown in Settings)
 No bank receipts in source (payments are simulated); no spend or budget in source (simulated); no loss or withdrawal reasons; no sponsor satisfaction or ROI; activations do not prove incremental visitors; no contract terms in source; no data for a next edition or another city; no footfall per sponsor.
@@ -222,7 +227,7 @@ Add a "Demo script" section to the README with these steps.
 - `tests/tools.test.ts`: each copilot read tool returns numbers identical to the engine; `query_data` runs through `DATABASE_URL_READONLY_TEST`.
 - `scripts/verify.ts` (`npm run verify`): read only check of the demo DB against the reference, exact output format in `docs/REPORTING.md` §4.
 - All reset based tests run on `DATABASE_URL_TEST` only.
-- `scripts/eval-copilot.ts` (`npm run eval:copilot`): runs `copilot_eval_questions.json` against the live model, saves transcripts to `eval/results/<timestamp>.md`. Not part of CI; reviewed by hand.
+- `scripts/eval-copilot.ts` (`npm run eval:copilot`): runs `copilot_eval_questions.json` against the live model, saves transcripts to `eval/results/<timestamp>.md`. Not part of CI; reviewed by hand, plus two mechanical checks (REVIEWER NOTE 06): V1, each question with an `auto_check` (Q15 to Q20) is graded by exact match on ids and numbers whose expected values the script computes from the engine at run time; V2, in every answer each id and the numbers next to it are checked against the engine, and any mismatch fails the answer regardless of the hand verdict.
 
 ## 8. README (write `README.md`)
 Sections: what it is; live link; demo script (§6.5); how it maps to the brief (table from §0); architecture; data sources (sourced vs simulated vs assumption); metric definitions (link to this spec); copilot design and guardrails; setup and env vars; tests and how to run the copilot eval; tools and plans used (with links) and what was reused, modified, verified; known limitations; decision log (`docs/DECISIONS.md`). Leave a section "Strategy, research and calculations" that includes `docs/STRATEGY_NOTES.md` verbatim (supplied separately).

@@ -35,7 +35,10 @@ export interface ResetSummary {
   ms: number;
 }
 
-/** Drops every table, view and function this app owns in schema public (extension objects are kept). */
+/**
+ * Drops every table, view and function this app owns in schema public (extension objects are kept),
+ * except copilot_usage: the daily copilot cap counter survives a reset so a reset cannot lift the cap.
+ */
 const DROP_ALL = `
 do $$
 declare r record;
@@ -48,6 +51,7 @@ begin
   for r in
     select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public' and c.relkind in ('r', 'p')
+      and c.relname <> 'copilot_usage' -- usage counter for the daily copilot cap, not app data (004 migration)
       and not exists (select 1 from pg_depend d where d.objid = c.oid and d.deptype = 'e')
   loop execute format('drop table if exists public.%I cascade', r.relname); end loop;
   for r in

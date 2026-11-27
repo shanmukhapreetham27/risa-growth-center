@@ -1,6 +1,6 @@
 /**
  * Demo rehearsal (REVIEWER NOTE 05 Phase 3 item 7): drives the copilot panel through SPEC §6.5 steps 1 to 7
- * on the test branch with the live model, saving reports/phase-3-demo/transcript.md and one screenshot per
+ * on the test branch with the live model, saving reports/phase-4-demo/transcript.md (DEMO_OUT overrides) and one screenshot per
  * step. Run once by hand (npm run demo:rehearse); not part of CI.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -10,7 +10,7 @@ import { assertTestDatabase } from "../lib/db/guard";
 import { resetDatabase } from "../lib/db/reset";
 import { loadEnv } from "../lib/env";
 
-const OUT = "reports/phase-3-demo";
+const OUT = process.env.DEMO_OUT ?? "reports/phase-4-demo";
 const lines: string[] = [];
 const log = (...l: string[]) => lines.push(...l);
 

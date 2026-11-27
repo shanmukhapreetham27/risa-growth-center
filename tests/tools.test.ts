@@ -6,6 +6,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Sql } from "../lib/db/client";
 import { confirmProposal, rejectProposal } from "../lib/copilot/proposals";
+import { expectedFor, gradeAuto, idNumberMismatches } from "../lib/copilot/eval-checks";
 import { executeTool, type ToolContext, TOOLS } from "../lib/copilot/tools";
 import {
   budgets,
@@ -27,6 +28,9 @@ let ro: Sql;
 let data: Dataset;
 const ctx = (): ToolContext => ({ sql, readonlySql: ro });
 type Out = Record<string, unknown> & { [k: string]: never | unknown };
+// Tool summaries are nested JSON; tests read them loosely.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = Record<string, any>;
 async function run(name: string, input: Record<string, unknown> = {}) {
   const r = await executeTool(name, input, ctx());
   return r as { ok: boolean; content: Out };
@@ -110,6 +114,50 @@ describe("read tools equal the engine", () => {
     const all = pipelineRows(data, "2025-04-20").filter((x) => x.stage === "negotiating");
     expect(r.content.total_matching).toBe(all.length);
   });
+  it("list_opportunities returns every match (up to 200) with a summary over all of them (E1)", async () => {
+    const r = await run("list_opportunities", { stale_only: true });
+    const engine = pipelineRows(data, "2025-04-20").filter((x) => x.stale);
+    expect([r.content.total_matching, r.content.returned, r.content.truncated]).toEqual([engine.length, engine.length, false]);
+    const s = r.content.summary as Loose;
+    const oldest = [...engine].sort((a, b) => a.last_update - b.last_update)[0];
+    expect([s.oldest_last_update.opportunity_id, s.oldest_last_update.name, s.oldest_last_update.days_since_update]).toEqual([oldest.id, oldest.brand_name, oldest.days_since_update]);
+    expect([s.oldest_last_update.opportunity_id, s.oldest_last_update.days_since_update]).toEqual(["O035", 89]); // REVIEWER NOTE 06 evidence 1
+    expect(s.highest_value.opportunity_id).toBe("O028");
+    expect(s.total_proposed_value_inr).toBe(engine.reduce((a, x) => a + x.proposed_value_inr, 0));
+    expect(Object.values(s.by_campaign as Record<string, { count: number }>).reduce((a, x) => a + x.count, 0)).toBe(engine.length);
+    expect(s.ranges.days_since_update).toEqual({ min: Math.min(...engine.map((x) => x.days_since_update)), max: 89 });
+    const limited = await run("list_opportunities", { stale_only: true, limit: 5 });
+    expect([limited.content.returned, limited.content.truncated, (limited.content.summary as { count: number }).count]).toEqual([5, true, engine.length]);
+  });
+  it("list_opportunities with opportunity_ids answers subset and range questions (evidence 2 and 3)", async () => {
+    const r = await run("list_opportunities", { opportunity_ids: ["O028", "O048", "O033", "O027"] });
+    const s = r.content.summary as Loose;
+    expect(s.count).toBe(4);
+    expect(s.ranges.days_since_update).toEqual({ min: 30, max: 47 });
+    expect(s.by_campaign["SC01 Brand Discovery Email"].count).toBe(3);
+    expect((await run("list_opportunities", { opportunity_ids: ["O999"] })).ok).toBe(false);
+  });
+  it("list_opportunities days_since_update_over, campaign and owner filters (Q16 to Q18)", async () => {
+    const over = await run("list_opportunities", { stage: "open", days_since_update_over: 60 });
+    expect((over.content.opportunities as { opportunity_id: string }[]).map((o) => o.opportunity_id).sort()).toEqual(["O030", "O035", "O036", "O037", "O045", "O046", "O053", "O055", "O056"]);
+    const sc01 = await run("list_opportunities", { stage: "open", campaign_id: "SC01" });
+    expect((sc01.content.summary as Loose).by_owner["T01 Riya Kapoor"].count).toBe(9);
+    const sc06 = await run("list_opportunities", { stage: "open", campaign_id: "SC06" });
+    expect([(sc06.content.summary as Loose).count, (sc06.content.summary as Loose).total_proposed_value_inr]).toEqual([8, 420000]);
+  });
+  it("get_collections and list_tasks carry the same summary fields (E1)", async () => {
+    const c = await run("get_collections", {});
+    const all = installmentRows(data, "2025-04-20");
+    const cs = c.content.summary as Loose;
+    expect([c.content.total_matching, c.content.truncated, cs.count, cs.total_amount_due_inr]).toEqual([all.length, false, all.length, all.reduce((a, x) => a + x.amount_due_inr, 0)]);
+    expect(Object.values(cs.by_status as Record<string, { count: number }>).reduce((a, x) => a + x.count, 0)).toBe(all.length);
+    const o = await run("get_collections", { status: "overdue" });
+    expect((o.content.summary as Loose).ranges.days_overdue).toEqual({ min: 22, max: 25 });
+    const t = await run("list_tasks");
+    const ts = t.content.summary as Loose;
+    const firstDue = [...data.tasks].filter((x) => x.due_date).sort((a, b) => a.due_date!.localeCompare(b.due_date!) || a.task_id.localeCompare(b.task_id))[0];
+    expect([t.content.total_matching, ts.count, ts.overdue_count, ts.earliest_due.task_id]).toEqual([6, 6, 4, firstDue.task_id]);
+  });
   it("get_opportunity_history: by id (Cobalt) and by name with two matches (Beardo)", async () => {
     const c = await run("get_opportunity_history", { opportunity_id: "O006" });
     const m = (c.content.matches as { versions: { stage: string; effective_at: string }[] }[])[0];
@@ -152,6 +200,42 @@ describe("read tools equal the engine", () => {
     expect((r.content.views as unknown[]).length).toBe(14);
     expect((r.content.fieldGuide as unknown[]).length).toBe(87);
     expect((r.content.gaps as unknown[]).length).toBe(8);
+  });
+});
+
+describe("eval checks (REVIEWER NOTE 06 V1, V2) on the engine", () => {
+  it("V1 expected values for Q15 to Q20 equal the reviewer's", () => {
+    const q15 = expectedFor({ kind: "oldest_open_deal" }, data);
+    expect([q15.ids, q15.names, q15.numbers, q15.as_of]).toEqual([["O035"], ["Cedar Wellness"], [89], "2025-04-20"]);
+    expect(expectedFor({ kind: "owner_share_of_campaign_open_deals", campaign_id: "SC01", owner_id: "T01" }, data).numbers).toEqual([9, 9]);
+    expect(expectedFor({ kind: "campaign_open_total", campaign_id: "SC06" }, data).numbers).toEqual([420000, 8]);
+    expect(expectedFor({ kind: "open_deals_not_updated_over", days: 60 }, data).ids).toEqual(["O030", "O035", "O036", "O037", "O045", "O046", "O053", "O055", "O056"]);
+    expect(expectedFor({ kind: "stale_open_count", as_of: "2025-03-15" }, data).numbers).toEqual([17]);
+    const d45 = { ...data, settings: { ...data.settings, stale_days: 45 } };
+    expect(expectedFor({ kind: "stale_open_count", setup: { stale_days: 45 } }, d45).numbers).toEqual([16, 45]);
+  });
+  it("V1 grading: exact ids and numbers plus the as of date", () => {
+    const q15 = expectedFor({ kind: "oldest_open_deal" }, data);
+    expect(gradeAuto("As of 20 Apr 2025, O035 Cedar Wellness has gone 89 days without an update.", q15).pass).toBe(true);
+    expect(gradeAuto("As of 20 Apr 2025, O036 Cedar Threads has gone 79 days without an update.", q15).problems).toEqual(["missing O035", "missing name Cedar Wellness", "missing number 89"]);
+    expect(gradeAuto("O035 Cedar Wellness, 89 days.", q15).problems).toEqual(["as of date 2025-04-20 not stated"]);
+    const q18 = expectedFor({ kind: "open_deals_not_updated_over", days: 60 }, data);
+    const nine = "O030, O035, O036, O037, O045, O046, O053, O055 and O056 (as of 20 Apr 2025).";
+    expect(gradeAuto(nine, q18).pass).toBe(true);
+    expect(gradeAuto(`${nine} O047 is close at 59 days.`, q18).problems).toEqual(["extra O047"]);
+  });
+  it("V2 catches a wrong number next to an id and passes correct ones", () => {
+    expect(idNumberMismatches("The oldest is O035 Cedar Wellness, last updated 89 days ago.", data, [])).toEqual([]);
+    expect(idNumberMismatches("The oldest is O056 Evergreen Threads, last updated 79 days ago.", data, [])).toEqual(["O056: 79"]);
+    expect(idNumberMismatches("| 1 | O028 | Cedar Pantry | ₹1,10,000 | Riya Kapoor | SC03 | 18 Mar 2025 | 33 |", data, [])).toEqual([]);
+    expect(idNumberMismatches("Cedar Pantry (O028, ₹1,00,000) and six tied at ₹90,000, including O053 Evergreen Living.", data, [])).toEqual(["O028: ₹1,00,000"]);
+    expect(idNumberMismatches("SC01 Brand Discovery Email has 9 open deals and a 7.7% meeting rate; SC06 Past Conversation Revival has 8 worth ₹4,20,000.", data, [])).toEqual([]);
+    // run 1 false failures: a pronoun "one", and a subset count the engine returned for that id through a tool
+    expect(idNumberMismatches("I can propose a follow-up task on O035 Cedar Wellness if you want one.", data, [])).toEqual([]);
+    const summary = { summary: { by_campaign: { "SC01 Brand Discovery Email": { count: 3, value_inr: 90000 } } } };
+    const each = "SC06 Past Conversation Revival, SC03 Brand Leader LinkedIn and SC01 Brand Discovery Email have 3 deals each.";
+    expect(idNumberMismatches(each, data, [])).toContain("SC01: 3");
+    expect(idNumberMismatches(each, data, [], [summary])).toEqual([]);
   });
 });
 

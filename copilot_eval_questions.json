@@ -82,5 +82,67 @@
   "q": "[after editing an opportunity in the UI to partner_confirmed] How many confirmed partnerships now?",
   "expect": "Reflects the edit immediately (e.g. 25), stamped at the simulation date, and earlier snapshots unchanged.",
   "type": "changed_data"
+ },
+ {
+  "id": "Q15",
+  "q": "Which open deal has gone the longest without an update?",
+  "expect": "O035 Cedar Wellness, 89 days, as of 20 Apr 2025.",
+  "type": "fact",
+  "auto_check": {
+   "kind": "oldest_open_deal"
+  }
+ },
+ {
+  "id": "Q16",
+  "q": "How many of Brand Discovery Email's open deals does Riya own?",
+  "expect": "9 of 9 (as of 20 Apr 2025).",
+  "type": "calc",
+  "auto_check": {
+   "kind": "owner_share_of_campaign_open_deals",
+   "campaign_id": "SC01",
+   "owner_id": "T01"
+  }
+ },
+ {
+  "id": "Q17",
+  "q": "What is the total proposed value of open deals in Past Conversation Revival?",
+  "expect": "₹4,20,000 across 8 deals (as of 20 Apr 2025).",
+  "type": "calc",
+  "auto_check": {
+   "kind": "campaign_open_total",
+   "campaign_id": "SC06"
+  }
+ },
+ {
+  "id": "Q18",
+  "q": "Which open deals were last updated more than 60 days ago?",
+  "expect": "Exactly O030, O035, O036, O037, O045, O046, O053, O055, O056 (as of 20 Apr 2025).",
+  "type": "fact",
+  "auto_check": {
+   "kind": "open_deals_not_updated_over",
+   "days": 60
+  }
+ },
+ {
+  "id": "Q19",
+  "q": "As of 15 March 2025, how many open opportunities were stale?",
+  "expect": "17 (as of 15 Mar 2025).",
+  "type": "snapshot",
+  "auto_check": {
+   "kind": "stale_open_count",
+   "as_of": "2025-03-15"
+  }
+ },
+ {
+  "id": "Q20",
+  "q": "[after setting stale days to 45 through the write module] How many open deals are stale now?",
+  "expect": "16, and the answer states the 45 day setting (as of 20 Apr 2025).",
+  "type": "changed_data",
+  "auto_check": {
+   "kind": "stale_open_count",
+   "setup": {
+    "stale_days": 45
+   }
+  }
  }
 ]

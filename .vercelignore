@@ -1,0 +1,15 @@
+# Never upload secrets or local build and test output to Vercel. Env vars are set in the Vercel project.
+.env*
+node_modules
+.next
+.git
+test-results
+playwright-report
+blob-report
+*.log
+*.tsbuildinfo
+# Not needed at runtime (data/ and db/migrations/ are needed: Reset reads them).
+eval
+reports
+scripts_reference
+docs/assignment_brief.pdf
