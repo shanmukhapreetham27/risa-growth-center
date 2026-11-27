@@ -43,7 +43,7 @@ describe("findUnverifiedNumbers", () => {
 // A tiny record set: ids and names as in the data.
 const opp = (opportunity_id: string, brand_name: string) => ({ opportunity_id, brand_name, opportunity_name: `${brand_name} festival partnership` });
 const records = buildRecordIndex({
-  opportunities: [opp("O035", "Cedar Wellness"), opp("O036", "Cedar Threads"), opp("O056", "Evergreen Threads"), opp("O028", "Cedar Pantry"), opp("O048", "Evergreen Pantry"), opp("O033", "Cedar Living"), opp("O027", "Bramble Works")],
+  opportunities: [opp("O035", "Cedar Wellness"), opp("O036", "Cedar Threads"), opp("O056", "Evergreen Threads"), opp("O028", "Cedar Pantry"), opp("O048", "Evergreen Pantry"), opp("O033", "Cedar Living"), opp("O027", "Bramble Works"), opp("O006", "Cobalt Learning")],
   campaigns: [{ sponsor_campaign_id: "SC01", campaign_name: "Brand Discovery Email" }],
   payments: [],
   tasks: [],
@@ -79,6 +79,12 @@ describe("ids and names (E2)", () => {
   it("a brand id beside the brand name counts as its id (run 1 false notice)", () => {
     expect(groundingIssues("The sponsorship by A001 Beardo is not measured.", h, beardo).missing_ids).toEqual([]);
     expect(groundingIssues("The sponsorship by Beardo is not measured.", h, beardo).missing_ids).toEqual(["Beardo"]);
+  });
+  it("F1: a name passes when its id appears anywhere in the same answer; a name with no id anywhere and a wrong name beside an id still fail", () => {
+    const h06: Anthropic.MessageParam[] = [{ role: "user", content: "Why did Cobalt Learning withdraw?" }, tool({ opportunity_id: "O006", brand_name: "Cobalt Learning" }), oldest];
+    expect(groundingIssues("O006 Cobalt Learning festival partnership was withdrawn. The brand (Cobalt Learning) was qualified.", h06, records).missing_ids).toEqual([]);
+    expect(groundingIssues("O036 Cedar Threads is in SC01. The oldest, Evergreen Threads, was last updated 79 days ago.", h06, records).missing_ids).toEqual(["Evergreen Threads"]);
+    expect(groundingIssues("O056 Cedar Threads was last updated 61 days ago.", h06, records).names).toEqual(['O056 is Evergreen Threads, not "Cedar Threads"']);
   });
   it("flags ids no tool returned", () => {
     expect(groundingIssues("O035 Cedar Wellness is older.", h, records).ids).toEqual(["O035"]);

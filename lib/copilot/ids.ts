@@ -134,18 +134,20 @@ export function segmentsOf(text: string): string[] {
 }
 
 /**
- * Opportunity and campaign names written without their id in the same sentence or table row (E2:
- * every answer and proposal that names one must include its id).
+ * Opportunity and campaign names written in an answer whose id appears nowhere in that answer (E2: every
+ * answer and proposal that names one must include its id). REVIEWER NOTE 07 F1: once the id is written
+ * anywhere in the same answer ("O006 Cobalt Learning ..."), a later bare mention ("the brand (Cobalt
+ * Learning)") passes. The name-beside-id mismatch check (nameMismatches) is unchanged.
  */
 export function namesWithoutIds(text: string, index: RecordIndex): string[] {
   const out: string[] = [];
   const pools: EntityType[] = ["opportunity", "campaign"];
-  for (const seg of segmentsOf(plainText(text))) {
+  const plain = plainText(text);
+  // Ids anywhere in the answer; an installment id also covers its deal's brand name (both are in its accepted names).
+  const covered = new Set(idsIn(plain).flatMap((m) => index.names.get(m.id) ?? []));
+  for (const b of plain.match(BRAND_ID) ?? []) if (index.brands.has(b)) covered.add(index.brands.get(b)!); // "A001 Beardo"
+  for (const seg of segmentsOf(plain)) {
     const lower = seg.toLowerCase();
-    const segIds = idsIn(seg).map((m) => m.id);
-    // An installment id also covers its deal's brand name (both are in its accepted names).
-    const covered = new Set(segIds.flatMap((id) => index.names.get(id) ?? []));
-    for (const b of seg.match(BRAND_ID) ?? []) if (index.brands.has(b)) covered.add(index.brands.get(b)!); // "A001 Beardo"
     for (const type of pools) {
       let pos = 0;
       while (pos < lower.length) {

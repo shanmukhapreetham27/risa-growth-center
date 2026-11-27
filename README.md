@@ -24,6 +24,8 @@ The demo database is shared by everyone who opens the link. Settings > "Reset to
 6. **A question the data cannot answer:** "Why did Cobalt Learning withdraw?" It says there is no reason field, shows what the record does contain (O006 confirmed 25 Feb, withdrawn 20 Mar), and offers a task to ask.
 7. **Change the data:** on Pipeline, open O028 Cedar Pantry and move it to partner_confirmed. Overview shows 25 at once, and the copilot answers 25 and names the app edit.
 
+**For graders:** set the simulation date in the header to **31 Mar 2025** to see the campaign mid flight, before the festival, with forward projections (projected cash before the festival ₹25,15,000 against ₹12,10,000 collected so far). Settings > **Reset to original data** restores everything, including the simulation date.
+
 A recorded rehearsal of these steps with the live model (transcript and one screenshot per step) is in `reports/phase-4-demo/`.
 
 ## 4. How it maps to the brief
