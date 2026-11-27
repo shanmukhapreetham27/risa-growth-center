@@ -24,6 +24,8 @@ export default defineConfig({
     locale: "en-IN",
     timezoneId: "Asia/Kolkata",
     trace: "retain-on-failure",
+    // A click that can never land (e.g. a covered button) fails after 30 s instead of hanging the test.
+    actionTimeout: 30_000,
   },
   projects: [
     { name: "e2e", testMatch: /(flows|layout)\.spec\.ts/ },

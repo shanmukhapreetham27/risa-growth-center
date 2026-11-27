@@ -114,6 +114,8 @@ export function CopilotProvider({ owners, children }: { owners: { id: string; na
             else if (ev.type === "tool_start") setProgress((p) => ({ round: p?.round ?? 1, tools: [...(p?.tools ?? []), { id: ev.id, name: ev.name, done: false }] }));
             else if (ev.type === "tool_end")
               setProgress((p) => ({ round: p?.round ?? 1, tools: (p?.tools ?? []).map((t) => (t.id === ev.id ? { ...t, done: true, ok: ev.ok, summary: ev.summary } : t)) }));
+            else if (ev.type === "grounding")
+              setProgress((p) => ({ round: p?.round ?? 1, tools: [...(p?.tools ?? []), { id: `grounding-${Date.now()}`, name: "grounding_check", done: true, ok: false, summary: ev.unverified.join(", ") }] }));
             else if (ev.type === "done") result = ev.result as ChatResult;
             else if (ev.type === "error") error = ev.message;
           }

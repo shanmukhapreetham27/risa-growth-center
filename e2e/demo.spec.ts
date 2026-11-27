@@ -44,6 +44,12 @@ async function openPanel(page: Page) {
   await expect(page.getByTestId("copilot-panel")).toBeVisible();
 }
 
+/** The open panel covers the header toggle, so close it with its own Close button. */
+async function closePanel(page: Page) {
+  await page.getByTestId("copilot-panel").getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.getByTestId("copilot-panel")).toBeHidden();
+}
+
 async function ask(page: Page, question: string) {
   const panel = page.getByTestId("copilot-panel");
   const before = await panel.getByTestId("copilot-assistant-turn").count();
@@ -53,8 +59,13 @@ async function ask(page: Page, question: string) {
   await expect(panel.getByTestId("copilot-working")).toBeVisible();
   await expect(panel.getByTestId("copilot-assistant-turn")).toHaveCount(before + 1, { timeout: 5 * 60_000 });
   const turn = panel.getByTestId("copilot-assistant-turn").last();
-  const answer = (await turn.getByTestId("copilot-answer").innerText().catch(() => "")) || (await turn.innerText());
-  const used = await turn.getByTestId("data-used").locator("li").allInnerTexts().catch(() => [] as string[]);
+  // Raw markdown as the model wrote it; the collapsed "Data used" list is read with textContent (innerText of hidden text is empty).
+  const answer = (await turn.getByTestId("copilot-answer").getAttribute("data-markdown").catch(() => null)) ?? (await turn.innerText());
+  const used = await turn
+    .getByTestId("data-used")
+    .locator("li")
+    .evaluateAll((els) => els.map((e) => (e.textContent ?? "").replace(/\s+/g, " ").trim()))
+    .catch(() => [] as string[]);
   log(`**User:** ${question}`, "", `**Copilot** (${((Date.now() - t0) / 1000).toFixed(1)} s):`, "", answer.trim(), "");
   if (used.length) log("Data used:", "", ...used.map((u) => `- ${u}`), "");
   return turn;
@@ -100,7 +111,7 @@ test("SPEC §6.5 demo, steps 1 to 7", async ({ page }) => {
 
   // Step 5 (client-side navigation keeps the conversation)
   log("## Step 5. The writes show on the pages", "");
-  await page.getByTestId("copilot-toggle").click();
+  await closePanel(page);
   await page.getByRole("link", { name: "Campaigns", exact: true }).click();
   await expect(page.getByTestId("status-SC01")).toHaveText("paused");
   log("Campaigns: SC01 Brand Discovery Email is paused.", "");
@@ -127,7 +138,7 @@ test("SPEC §6.5 demo, steps 1 to 7", async ({ page }) => {
 
   // Step 7
   log("## Step 7. An edit on Pipeline shows on Overview and in the copilot", "");
-  await page.getByTestId("copilot-toggle").click();
+  await closePanel(page);
   await page.getByRole("link", { name: "Pipeline", exact: true }).click();
   await page.getByTestId("open-O028").click();
   const drawer = page.getByTestId("opportunity-drawer");

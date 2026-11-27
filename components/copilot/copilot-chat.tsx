@@ -24,6 +24,7 @@ const TOOL_LABEL: Record<string, string> = {
   data_dictionary: "data dictionary",
   propose_task: "task proposal",
   propose_campaign_status: "campaign status proposal",
+  grounding_check: "number check: recalculating untraced figures",
 };
 
 function Answer({ text }: { text: string }) {
@@ -91,7 +92,7 @@ export function CopilotChat({ full = false }: { full?: boolean }) {
                 </p>
               ) : (
                 t.text && (
-                  <div data-testid="copilot-answer">
+                  <div data-testid="copilot-answer" data-markdown={t.text}>
                     <Answer text={t.text} />
                   </div>
                 )
@@ -124,7 +125,7 @@ export function CopilotChat({ full = false }: { full?: boolean }) {
             </span>
             {progress?.tools.map((t) => (
               <span key={t.id}>
-                {t.done ? (t.ok ? "✓" : "✗") : "…"} Reading {TOOL_LABEL[t.name] ?? t.name}
+                {t.name === "grounding_check" ? `↻ ${TOOL_LABEL.grounding_check}` : `${t.done ? (t.ok ? "✓" : "✗") : "…"} Reading ${TOOL_LABEL[t.name] ?? t.name}`}
               </span>
             ))}
           </div>

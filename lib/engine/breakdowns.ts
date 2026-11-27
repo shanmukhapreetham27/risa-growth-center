@@ -10,9 +10,13 @@ export interface GroupStats {
   opportunities: number;
   confirmed: number;
   confirmed_value_inr: number;
-  /** Not in the reference; shown on Diagnose. */
+  /** Not in the reference; shown on Diagnose and used by the copilot. */
   open: number;
   lost_or_withdrawn: number;
+  confirmed_cash: number;
+  confirmed_cash_value_inr: number;
+  confirmed_in_kind: number;
+  confirmed_in_kind_value_inr: number;
 }
 
 // L=latest(oh,'opportunity_id',t).merge(brands[['brand_id','industry']],on='brand_id')
@@ -20,18 +24,30 @@ function latestAll(data: Dataset, asOf: string) {
   return [...latestBy(data.oppHistory, (h) => h.opportunity_id, istEndOfDay(asOf)).values()];
 }
 
-function groupStats<T extends { stage: string; confirmed_value_inr: number }>(rows: T[], key: (r: T) => string | null): Record<string, GroupStats> {
+function groupStats<T extends { stage: string; confirmed_value_inr: number; opportunity_id: string }>(
+  data: Dataset,
+  rows: T[],
+  key: (r: T) => string | null,
+): Record<string, GroupStats> {
+  const support = new Map(data.opportunities.map((o) => [o.opportunity_id, o.support_type]));
   const out: Record<string, GroupStats> = {};
   for (const r of rows) {
     const k = key(r);
     if (k === null) continue; // pandas groupby drops null keys
-    const g = (out[k] ??= { opportunities: 0, confirmed: 0, confirmed_value_inr: 0, open: 0, lost_or_withdrawn: 0 });
+    const g = (out[k] ??= { opportunities: 0, confirmed: 0, confirmed_value_inr: 0, open: 0, lost_or_withdrawn: 0, confirmed_cash: 0, confirmed_cash_value_inr: 0, confirmed_in_kind: 0, confirmed_in_kind_value_inr: 0 });
     g.opportunities += 1;
     if (OPEN_STAGES.has(r.stage as Stage)) g.open += 1;
     if (LOST_STAGES.has(r.stage as Stage)) g.lost_or_withdrawn += 1;
     if (r.stage === "partner_confirmed") {
       g.confirmed += 1;
       g.confirmed_value_inr += r.confirmed_value_inr;
+      if (support.get(r.opportunity_id) === "in_kind") {
+        g.confirmed_in_kind += 1;
+        g.confirmed_in_kind_value_inr += r.confirmed_value_inr;
+      } else {
+        g.confirmed_cash += 1;
+        g.confirmed_cash_value_inr += r.confirmed_value_inr;
+      }
     }
   }
   return Object.fromEntries(Object.keys(out).sort().map((k) => [k, out[k]]));
@@ -39,14 +55,14 @@ function groupStats<T extends { stage: string; confirmed_value_inr: number }>(ro
 
 // ref['by_owner_final']={o:dict(opportunities=len(g),confirmed=..., confirmed_value_inr=...) for o,g in L.groupby('owner_name')}
 export function byOwner(data: Dataset, asOf: string): Record<string, GroupStats> {
-  return groupStats(latestAll(data, asOf), (h) => h.owner_name);
+  return groupStats(data, latestAll(data, asOf), (h) => h.owner_name);
 }
 
 // ref['by_industry_final']: same, grouped by the brand's industry (inner merge on brand_id)
 export function byIndustry(data: Dataset, asOf: string): Record<string, GroupStats> {
   const industry = new Map(data.brands.map((b) => [b.brand_id, b.industry]));
   const rows = latestAll(data, asOf).filter((h) => h.brand_id !== null && industry.has(h.brand_id));
-  return groupStats(rows, (h) => industry.get(h.brand_id as string) ?? null);
+  return groupStats(data, rows, (h) => industry.get(h.brand_id as string) ?? null);
 }
 
 export interface EdgeCases {

@@ -6,6 +6,7 @@
  * (DATABASE_URL_READONLY), which has SELECT on the v_* views only and a 3 s statement timeout.
  */
 import type { Sql } from "../db/client";
+import { toIstIso } from "../engine/time";
 
 export const QUERY_LIMIT = 200;
 const FORBIDDEN = /\b(insert|update|delete|merge|drop|alter|create|truncate|grant|revoke|copy|call|do|execute|prepare|listen|notify|vacuum|analyze|lock|set|reset|begin|commit|rollback|savepoint|refresh|comment|security|pg_sleep|pg_read_file|pg_ls_dir|dblink|lo_import|lo_export)\b/i;
@@ -51,7 +52,7 @@ export async function queryData(readonlySql: Sql, raw: string): Promise<QueryRes
   const sql = checkQuery(raw);
   const rows = await readonlySql.begin("read only", async (tx) => tx.unsafe(`select * from (${sql}) as q limit ${QUERY_LIMIT + 1}`));
   const list = (rows as unknown as Record<string, unknown>[]).map((r) =>
-    Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v instanceof Date ? v.toISOString() : typeof v === "bigint" ? Number(v) : v])),
+    Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v instanceof Date ? toIstIso(v.getTime()) : typeof v === "bigint" ? Number(v) : v])),
   );
   const truncated = list.length > QUERY_LIMIT;
   const out = truncated ? list.slice(0, QUERY_LIMIT) : list;

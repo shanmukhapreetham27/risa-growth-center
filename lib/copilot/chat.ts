@@ -13,6 +13,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Proposal } from "./proposals";
 import { SYSTEM_PROMPT } from "./system-prompt";
+import { findUnverifiedNumbers, groundingNote } from "./grounding";
 import { executeTool, type ToolContext, TOOLS } from "./tools";
 
 export const MAX_ROUNDS = 6;
@@ -47,7 +48,8 @@ export interface ToolCallRecord {
 export type ChatEvent =
   | { type: "round"; round: number }
   | { type: "tool_start"; id: string; name: string; input: unknown }
-  | { type: "tool_end"; id: string; name: string; ok: boolean; summary: string; proposal?: Proposal };
+  | { type: "tool_end"; id: string; name: string; ok: boolean; summary: string; proposal?: Proposal }
+  | { type: "grounding"; unverified: string[] };
 
 export interface ChatResult {
   appended: Anthropic.MessageParam[];
@@ -59,6 +61,8 @@ export interface ChatResult {
   stop_reason: string | null;
   ms: number;
   notice?: string;
+  /** Rule 3 check: numbers the first answer could not trace (null = none), and any left in the final answer. */
+  grounding: { asked_to_recompute: string[] | null; final_unverified: string[] };
 }
 
 let client: Anthropic | null = null;
@@ -103,6 +107,8 @@ export async function runChat(history: Anthropic.MessageParam[], ctx: ToolContex
   let last: Anthropic.Message | null = null;
   let rounds = 0;
   let notice: string | undefined;
+  let askedToRecompute: string[] | null = null;
+  const textOf = (m: Anthropic.Message) => m.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n\n").trim();
 
   while (rounds < MAX_ROUNDS) {
     rounds += 1;
@@ -126,7 +132,19 @@ export async function runChat(history: Anthropic.MessageParam[], ctx: ToolContex
     appended.push({ role: "assistant", content: resp.content as unknown as Anthropic.ContentBlockParam[] });
 
     if (resp.stop_reason === "pause_turn") continue;
-    if (resp.stop_reason !== "tool_use") break;
+    if (resp.stop_reason !== "tool_use") {
+      // Rule 3 grounding check, at most once per request: untraced numbers go back to the model.
+      if (resp.stop_reason === "end_turn" && askedToRecompute === null && rounds < MAX_ROUNDS) {
+        const unverified = findUnverifiedNumbers(textOf(resp), [...history, ...appended]);
+        if (unverified.length) {
+          askedToRecompute = unverified;
+          onEvent?.({ type: "grounding", unverified });
+          appended.push({ role: "user", content: [{ type: "text", text: groundingNote(unverified) }] });
+          continue;
+        }
+      }
+      break;
+    }
 
     const results: Anthropic.ToolResultBlockParam[] = [];
     for (const block of resp.content) {
@@ -146,12 +164,14 @@ export async function runChat(history: Anthropic.MessageParam[], ctx: ToolContex
     if (rounds === MAX_ROUNDS) notice = `Stopped after ${MAX_ROUNDS} tool rounds without a final answer. Ask again or narrow the question.`;
   }
 
-  const text = (last?.content ?? []).flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n\n").trim();
+  const text = last ? textOf(last) : "";
+  const finalUnverified = text ? findUnverifiedNumbers(text, [...history, ...appended]) : [];
+  if (finalUnverified.length) notice = `Not traced to a tool result: ${finalUnverified.join(", ")}. Treat these as unverified.`;
   if (last?.stop_reason === "refusal") notice = "The model declined to answer this request. Rephrase it as a question about the festival's sponsorship data.";
   else if (last?.stop_reason === "max_tokens") notice = "The answer was cut off at the output limit.";
-  const result: ChatResult = { appended, text, tool_calls: toolCalls, proposals, usage, rounds, stop_reason: last?.stop_reason ?? null, ms: Date.now() - started, notice };
+  const result: ChatResult = { appended, text, tool_calls: toolCalls, proposals, usage, rounds, stop_reason: last?.stop_reason ?? null, ms: Date.now() - started, notice, grounding: { asked_to_recompute: askedToRecompute, final_unverified: finalUnverified } };
   console.log(
-    `[copilot] model=${model()} rounds=${rounds} calls=${usage.calls} tools=${toolCalls.map((t) => t.name).join(",") || "-"} in=${usage.input_tokens} out=${usage.output_tokens} cache_read=${usage.cache_read_input_tokens} cache_write=${usage.cache_creation_input_tokens} cost_usd=${costUsd(usage).toFixed(4)} ms=${result.ms} stop=${result.stop_reason}`,
+    `[copilot] model=${model()} rounds=${rounds} calls=${usage.calls} tools=${toolCalls.map((t) => t.name).join(",") || "-"} in=${usage.input_tokens} out=${usage.output_tokens} cache_read=${usage.cache_read_input_tokens} cache_write=${usage.cache_creation_input_tokens} cost_usd=${costUsd(usage).toFixed(4)} ms=${result.ms} stop=${result.stop_reason} grounding_recheck=${askedToRecompute ? askedToRecompute.join("|") : "-"} unverified=${finalUnverified.join("|") || "-"}`,
   );
   return result;
 }

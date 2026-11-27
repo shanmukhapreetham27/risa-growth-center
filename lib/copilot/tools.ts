@@ -20,9 +20,11 @@ import {
   isIsoDate,
   istDateOf,
   istEndOfDay,
+  latestBy,
   loadDataset,
   pipelineRows,
   stageConversion,
+  DAY_MS,
   STAGES,
   targetInForce,
   toIstIso,
@@ -237,6 +239,31 @@ function header(data: Dataset, asOf: string) {
 }
 
 // ---------------------------------------------------------------- read tools
+/** Opportunities confirmed at `d` that are no longer confirmed at the simulation date, and the reverse. */
+function laterChanges(data: Dataset, d: string) {
+  const sim = data.settings.simulation_date;
+  if (d >= sim) return null;
+  const at = latestBy(data.oppHistory, (h) => h.opportunity_id, istEndOfDay(d));
+  const now = latestBy(data.oppHistory, (h) => h.opportunity_id, istEndOfDay(sim));
+  const rows: { opportunity_id: string; brand_name: string | null; stage_at_as_of: string; stage_at_simulation_date: string; changed_at: string }[] = [];
+  for (const [id, h] of at) {
+    const n = now.get(id);
+    if (!n || (h.stage === "partner_confirmed") === (n.stage === "partner_confirmed")) continue;
+    rows.push({ opportunity_id: id, brand_name: h.brand_name, stage_at_as_of: h.stage, stage_at_simulation_date: n.stage, changed_at: toIstIso(n.effective_at) });
+  }
+  return { note: `confirmed status at ${d} vs at the simulation date ${sim}`, opportunities: rows };
+}
+
+/** App-made versions (source app) in force by `d`, newest first, at most 5 (edits made in the UI or by confirmed proposals). */
+function appEdits(data: Dataset, d: string) {
+  const t = istEndOfDay(d);
+  const rows = data.oppHistory
+    .filter((h) => h.source === "app" && h.effective_at <= t)
+    .sort((a, b) => b.effective_at - a.effective_at)
+    .map((h) => ({ history_id: h.history_id, opportunity_id: h.opportunity_id, brand_name: h.brand_name, stage: h.stage, proposed_value_inr: h.proposed_value_inr, confirmed_value_inr: h.confirmed_value_inr, effective_at: toIstIso(h.effective_at) }));
+  return { opportunity_versions_from_app_edits: rows.length, latest: rows.slice(0, 5) };
+}
+
 function getOverview(data: Dataset, input: Input) {
   const d = asOfOf(data, input);
   const s = computeSnapshot(data, d);
@@ -257,6 +284,8 @@ function getOverview(data: Dataset, input: Input) {
         }
       : null,
     festival: { starts_at: toIstIso(festStart), ends_at: toIstIso(data.event.event_ends_at), festival_started_by_as_of: istEndOfDay(d) >= festStart },
+    changed_after_as_of: laterChanges(data, d),
+    app_edits: appEdits(data, d),
     assumptions: { ...data.settings, cash_goal_note: "team cash goal = next-edition base case (assumption)" },
     origin: {
       sourced: Object.keys(s).filter((k) => !SIMULATED_KEYS.includes(k) && !ASSUMPTION_KEYS.includes(k) && k !== "projected_cash_before_festival_inr"),
@@ -298,7 +327,7 @@ function getFunnel(data: Dataset, input: Input) {
     ...header(data, d),
     group_by: groupBy,
     groups: stats,
-    note: groupBy === "owner" ? "owner = owner_name of the opportunity's latest version; confirmed_value_inr is cash + in kind" : "industry of the brand; confirmed_value_inr is cash + in kind",
+    note: `${groupBy === "owner" ? "owner = owner_name of the opportunity's latest version" : "industry of the brand"}; confirmed_value_inr is cash + in kind, split in confirmed_cash(_value_inr) and confirmed_in_kind(_value_inr)`,
     origin: "sourced",
   };
 }
@@ -335,10 +364,29 @@ function listOpportunities(data: Dataset, input: Input) {
   }
   const ties = [...byValue.entries()].filter(([, ids]) => ids.length > 1).map(([k, ids]) => ({ value_inr: Number(k.split("|")[1]), value_display: inr(Number(k.split("|")[1])), stage_group: k.split("|")[0], ids }));
   const cutTie = shown.length < rows.length && rows[shown.length].value === shown[shown.length - 1]?.value;
+  // Counts and values over ALL matching rows (not only the returned ones), so "where do they sit" needs no guessing.
+  const tally = (key: (r: (typeof rows)[number]) => string | null) => {
+    const m: Record<string, { count: number; value_inr: number }> = {};
+    for (const r of rows) {
+      const k = key(r) ?? "none";
+      m[k] ??= { count: 0, value_inr: 0 };
+      m[k].count += 1;
+      m[k].value_inr += r.value;
+    }
+    return m;
+  };
+  const breakdown = {
+    by_channel_group: tally((r) => r.group),
+    by_campaign: tally((r) => r.sponsor_campaign_id),
+    by_owner: tally((r) => r.owner_name),
+    by_stage: tally((r) => r.stage),
+    total_value_inr: rows.reduce((a, r) => a + r.value, 0),
+  };
   return {
     ...header(data, d),
     total_matching: filtered,
     returned: shown.length,
+    breakdown_of_all_matching: breakdown,
     order: input.sort === "last_update" ? "last update, oldest first, then id" : "stage group (open, confirmed, lost or withdrawn), then value descending, then oldest last update first, then id",
     tie_break_rule: "value descending, then oldest last update first, then id",
     ties,
@@ -442,6 +490,7 @@ function getCampaignDecisions(data: Dataset, input: Input) {
         lost_or_withdrawn: r.metrics.lost_or_withdrawn,
         confirmed_value_cash_inr: r.metrics.confirmed_value_cash_inr,
         confirmed_value_in_kind_inr: r.metrics.confirmed_value_in_kind_inr,
+        confirmed_value_total_inr: r.metrics.confirmed_value_total_inr,
         open_opportunities: r.metrics.open_opportunities,
         stale_open_opportunities_7d: r.metrics.stale_open_opportunities_7d,
         cash_collected_inr_simulated: r.metrics.cash_collected_inr_simulated,
@@ -481,6 +530,8 @@ function getCollections(data: Dataset, input: Input) {
       amount_due_inr: r.amount_due_inr,
       due_date: istDateOf(r.due_at),
       status: r.status,
+      days_overdue: r.status === "overdue" ? Math.round((Date.parse(`${d}T00:00:00Z`) - Date.parse(`${istDateOf(r.due_at)}T00:00:00Z`)) / DAY_MS) : null,
+      days_until_due: r.status === "due" || r.status === "upcoming" ? Math.round((Date.parse(`${istDateOf(r.due_at)}T00:00:00Z`) - Date.parse(`${d}T00:00:00Z`)) / DAY_MS) : null,
       paid_date: r.paid_at && r.status === "paid" ? istDateOf(r.paid_at) : null,
       stage_at_as_of: r.stage_at_d,
       flags: r.flags,
@@ -488,6 +539,7 @@ function getCollections(data: Dataset, input: Input) {
     returned: Math.min(rows.length, 60),
     total_matching: rows.length,
     order: "overdue, due, upcoming, paid, voided; then due date",
+    totals_note: "totals_by_status counts and amounts are exact sums; days_overdue = calendar days from the due date to the as of date",
   };
 }
 

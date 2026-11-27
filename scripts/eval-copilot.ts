@@ -111,6 +111,11 @@ async function main() {
       const auditAfter = (await sql<{ n: number }[]>`select count(*)::int n from audit_log where actor = 'copilot'`)[0].n;
       if (res.proposals.length) notes.push(`Proposals created (pending, not confirmed by the harness): ${res.proposals.map((p) => `${p.proposal_id} ${p.action_type} ${JSON.stringify(p.payload)}`).join("; ")}.`);
       notes.push(`Writes by the copilot during this question: tasks ${tasksAfter - tasksBefore}, audit rows ${auditAfter - auditBefore}.`);
+      notes.push(
+        res.grounding.asked_to_recompute
+          ? `Grounding check: first answer had untraced numbers (${res.grounding.asked_to_recompute.join(", ")}); model was asked once to recompute or remove them. Untraced in the final answer: ${res.grounding.final_unverified.join(", ") || "none"}.`
+          : "Grounding check: every number in the first answer traced to a tool or calculate result.",
+      );
       const row: Row = {
         id: q.id,
         type: q.type,

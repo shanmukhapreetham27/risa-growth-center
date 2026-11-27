@@ -1,0 +1,551 @@
+{
+ "started": "2026-11-27T02:40:57.675Z",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "failure": null,
+ "totals": {
+  "input": 88,
+  "output": 8220,
+  "read": 196885,
+  "write": 44527,
+  "cost": 0.21338200000000002,
+  "s": 93.49999999999999
+ },
+ "rows": [
+  {
+   "id": "Q01",
+   "type": "fact",
+   "question": "How many confirmed partnerships do we have and how does that compare with the goal?",
+   "expect": "24 confirmed (latest stage partner_confirmed) vs goal 28 from \"Sponsor revised plan\" (effective 15 Mar 2025); 4 short. As of 20 Apr 2025.",
+   "answer": "As of 20 Apr 2025, we have **24 confirmed partnerships** (sourced). The goal is **28** under the revised sponsor plan, which took effect on 15 Mar 2025. We are **4 short**, which is about 86% of the goal.\n\n- Confirmed value is ₹22,40,000 in total. That is ₹20,00,000 cash and ₹2,40,000 in kind. The in-kind part is not cash.\n- 24 brands are confirmed, so the brand count matches the partnership count.\n- 26 deals are still open, with ₹14,40,000 in proposed value. All 26 are stale, meaning no update in more than 7 days (the 7-day threshold is an assumption set in Settings).\n\nThe festival ended on 13 Apr 2025. Closing the 4-partnership gap would therefore count toward the baseline for the next edition, not this one.",
+   "tools": [
+    {
+     "id": "toolu_01TtjX48mxvafKsaX8BGVpQE",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 1209,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 314,
+    "cache_creation_input_tokens": 3904,
+    "cache_read_input_tokens": 9663,
+    "calls": 2
+   },
+   "latency_s": 6.1,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0138783,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q02",
+   "type": "calc",
+   "question": "Which campaign brought in the most confirmed cash?",
+   "expect": "Creator Network Referrals: ₹7,25,000 cash from 9 confirmed. Note Warm Partner Introductions ties on total confirmed value (₹7,85,000 each) once in kind is included.",
+   "answer": "**SC05 Creator Network Referrals brought in the most confirmed cash: ₹7,25,000** (sourced, as of 20 Apr 2025). It had 9 confirmed partnerships.\n\n| Campaign | Confirmed cash | Confirmed in kind (not cash) |\n|---|---|---|\n| SC05 Creator Network Referrals | ₹7,25,000 | ₹60,000 |\n| SC02 Warm Partner Introductions | ₹6,40,000 | ₹1,45,000 |\n| SC04 Partner Interest Form | ₹6,35,000 | ₹35,000 |\n| SC01, SC03, SC06 | ₹0 | ₹0 |\n\n- **Ranking by cash plus in kind:** SC02 and SC05 tie at ₹7,85,000. SC05 still leads on cash alone. If you meant total value, tell me and I'll treat them as tied.\n- **Cash collected (simulated):** SC05 has collected ₹6,15,000 of its ₹7,25,000. SC04 has collected all ₹6,35,000, and SC02 has collected ₹5,92,500. So on collected cash, SC04 is ahead of SC05.\n- **Cold campaigns:** SC01, SC03 and SC06 have 0 confirmed as of 20 Apr 2025. Cobalt Learning, a cold SC03 deal, was confirmed from 25 Feb to 20 Mar 2025 and was then withdrawn.",
+   "tools": [
+    {
+     "id": "toolu_019FXiDmeQXQH2kEQHSQyyov",
+     "name": "get_campaign_decisions",
+     "input": {},
+     "ok": true,
+     "ms": 397,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 531,
+    "cache_creation_input_tokens": 2713,
+    "cache_read_input_tokens": 11699,
+    "calls": 2
+   },
+   "latency_s": 5.5,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0132744,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q03",
+   "type": "diagnosis",
+   "question": "Why are we behind on partnerships?",
+   "expect": "Cold channels (Brand Discovery Email, Brand Leader LinkedIn, Past Conversation Revival) created 33 opportunities and 0 confirmed; all 26 open opportunities are stale (no stage update in over 7 days). Warm channels converted 24 of 25. Must separate evidence from assumption (no loss reasons in data).",
+   "answer": "**Answer:** As of 20 Apr 2025, we have 24 confirmed partnerships against a goal of 28 (Sponsor revised plan), so we are 4 short. The shortfall comes from the cold channels, which have confirmed nothing so far.\n\n**Evidence (sourced unless marked)**\n- **Warm channels (SC02, SC04, SC05):** 44 brands contacted, 25 opportunities, 24 confirmed. That is 96% of proposals confirmed.\n- **Cold channels (SC01, SC03, SC06):** 141 brands contacted, 33 opportunities, 21 proposals and 0 confirmed.\n  - Only 49.6% of contacted brands responded, against 100% for warm.\n  - Only 34.3% of responders reached a conversation.\n  - Cold opportunities mostly stop at the proposal-to-confirmed step.\n- **Open pipeline:** 26 open opportunities worth ₹14,40,000 proposed. All 26 are stale, meaning no update in more than 7 days (the 7-day limit is an assumption). Many have had no update for 30 to 79 days.\n  - The largest are Cedar Pantry (O028, ₹1,10,000, negotiating, SC03, 33 days since update) and six deals at ₹90,000 each.\n  - The six ₹90,000 deals are tied: O053, O038, O048, O058, O033, O043. I listed them in the tool's tie-break order (value descending, then oldest last update, then id).\n  - Every open deal in the list is cold. The list returned 20 of the 26 open deals.\n- **Campaign badges:** SC01 is STOP (0 confirmed, 11 opportunities, 7.7% meeting rate). SC03 and SC06 are CHANGE (0% win rate, 100% stale share). SC02, SC04 and SC05 are all SCALE.\n- **Cold channel spend (simulated):** SC01 ₹30,000, SC03 ₹25,100 and SC06 ₹4,000, with ₹0 cash collected from any of them.\n\n**Likely explanation (inference)**\n- Cold outreach is reaching many brands, but few turn into conversations. The deals that do form are not being followed up, so they sit unconfirmed.\n- Warm channels convert almost everything, but they only touched 44 brands, so volume there is small.\n- The gap to goal (4 partnerships) is smaller than the 26 stalled open deals, so re-engaging them is the nearest lever.\n\n**What the data can't show:** There are no loss or withdrawal reasons, no notes on why deals stalled, and no record of what follow-up was attempted. I can't confirm the causes above from this data.\n\n**Next steps:** I can propose follow-up tasks for the stalled high-value deals, split by owner (Riya, Kabir, Meera, Nisha). I can also propose pausing SC01. Which would you like?",
+   "tools": [
+    {
+     "id": "toolu_01LakUDQh48Z3z2pdzbHZxak",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 446,
+     "summary": "no arguments as of 2025-04-20"
+    },
+    {
+     "id": "toolu_01FiTPZgHqgWkSNWZD9wWrko",
+     "name": "get_funnel",
+     "input": {
+      "group_by": "channel_group"
+     },
+     "ok": true,
+     "ms": 7,
+     "summary": "group_by=channel_group as of 2025-04-20"
+    },
+    {
+     "id": "toolu_015LpM9njuQUU52QhTTTQKrf",
+     "name": "list_opportunities",
+     "input": {
+      "stale_only": true
+     },
+     "ok": true,
+     "ms": 7,
+     "summary": "20 of 26 opportunities as of 2025-04-20, 3 tie group(s)"
+    },
+    {
+     "id": "toolu_01PEQnyTGdMbmGJdF665R9VU",
+     "name": "get_campaign_decisions",
+     "input": {},
+     "ok": true,
+     "ms": 2,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 1124,
+    "cache_creation_input_tokens": 9446,
+    "cache_read_input_tokens": 11694,
+    "calls": 2
+   },
+   "latency_s": 10.2,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0360364,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q04",
+   "type": "follow_up",
+   "question": "Of those stuck deals, which are worth the most?",
+   "expect": "Follow up to Q03. Highest is Cedar Pantry (O028, negotiating, ₹1,10,000, Riya Kapoor). Six open deals tie at ₹90,000: O053 Evergreen Living, O038 Daybreak Pantry, O048 Evergreen Pantry, O058 Fable Pantry, O033 Cedar Living, O043 Daybreak Living. Must state the tie. Order inside the tie follows the tie break rule (oldest last update first, then id) and is not graded.",
+   "answer": "**Most valuable stuck deal (as of 20 Apr 2025, sourced):** Cedar Pantry (O028) is worth ₹1,10,000 in proposed cash. It is at the negotiating stage in SC03 Brand Leader LinkedIn (a cold channel) and is owned by Riya Kapoor. It was last updated 18 Mar 2025, which is 33 days ago.\n\nNext in line are six deals tied at ₹90,000. I ordered them by the tie-break rule: value descending, then oldest last update first, then id.\n\n| Rank | Opportunity | Brand | Campaign | Owner | Days since update |\n|---|---|---|---|---|---|\n| 2 | O053 | Evergreen Living | SC06 | Nisha Rao | 73 |\n| 3 | O038 | Daybreak Pantry | SC06 | Nisha Rao | 56 |\n| 4 | O048 | Evergreen Pantry | SC01 | Riya Kapoor | 47 |\n| 5 | O058 | Fable Pantry | SC03 | Meera Iyer | 38 |\n| 6 | O033 | Cedar Living | SC01 | Riya Kapoor | 30 |\n| 7 | O043 | Daybreak Living | SC03 | Meera Iyer | 21 |\n\nAfter those, Bramble Works (O027) is worth ₹70,000. It is negotiating in SC01 with Riya Kapoor and has gone 41 days without an update.\n\nAll of these deals are cash, at the negotiating stage and stale. The \"stale\" threshold is 7 days, which is an assumption.\n\nIf you want to pick the ₹90,000 deals by something other than the tie-break order, I can use age or owner instead. I can also propose follow-up tasks for these top deals.",
+   "tools": [],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 696,
+    "cache_creation_input_tokens": 985,
+    "cache_read_input_tokens": 15251,
+    "calls": 1
+   },
+   "latency_s": 5.2,
+   "rounds": 1,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.010955600000000001,
+   "harness_notes": [
+    "Asked in the same conversation as Q03 (follow up).",
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q05",
+   "type": "snapshot",
+   "question": "How many partnerships were confirmed as of 10 March 2025?",
+   "expect": "15 confirmed, ₹1,260,000 cash. Includes Cobalt Learning (confirmed 25 Feb, withdrawn 20 Mar). Goal in force then: 20 (launch plan).",
+   "answer": "**15 partnerships were confirmed as of 10 Mar 2025** (end of day IST, sourced). They came from 15 different brands.\n\n- Total confirmed value was ₹13,95,000. Cash was ₹12,60,000 and in kind was ₹1,35,000. In kind is not cash.\n- The launch plan goal in force on that date was 20 confirmed partnerships, so the team was 5 short.\n\nSome of these changed after 10 Mar:\n- O006 Cobalt Learning was confirmed on that date but was withdrawn on 20 Mar 2025. It is included in the 15.\n- Five other deals were not yet confirmed on 10 Mar and were confirmed later, between 12 and 19 Mar. They are not in the 15. They are O017 Aster Works, O018 Bramble Pantry, O019 Bramble Studio, O025 Bramble Wellness and O026 Bramble Threads.",
+   "tools": [
+    {
+     "id": "toolu_013uQwqbuvWmUjXhuShxLAZU",
+     "name": "get_overview",
+     "input": {
+      "as_of": "2025-03-10"
+     },
+     "ok": true,
+     "ms": 407,
+     "summary": "as_of=2025-03-10 as of 2025-03-10"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 361,
+    "cache_creation_input_tokens": 2452,
+    "cache_read_input_tokens": 11703,
+    "calls": 2
+   },
+   "latency_s": 4.6,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0109223,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q06",
+   "type": "calc_caveat",
+   "question": "How much cash have we actually collected?",
+   "expect": "Simulated payments: ₹1,842,500 collected by 20 Apr; ₹1,790,000 before the festival started; ₹157,500 outstanding across 3 overdue installments. Must say payment data is simulated, source has no bank receipts.",
+   "answer": "As of 20 Apr 2025, we have collected **₹18,42,500** in cash. This figure is **simulated**, because the source data has no bank receipts.\n\n- ₹17,90,000 of that was collected before the festival started on 12 Apr 2025 (simulated).\n- Confirmed cash value is ₹20,00,000 (sourced). That leaves ₹1,57,500 outstanding (simulated).\n- The outstanding amount is all overdue, across 3 installments (simulated).\n- The ₹2,40,000 of in-kind value is not cash, so it is not included in any of these figures.\n- Cash collected before the festival is ₹6,56,000 short of the team cash goal of ₹24,46,000. That goal is an assumption: it is the next-edition base case set in Settings.\n\nI can list the 3 overdue installments or propose follow-up tasks for them if you want.",
+   "tools": [
+    {
+     "id": "toolu_01NRfpyzE7bkqXdmZMm67hPT",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 392,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 317,
+    "cache_creation_input_tokens": 1848,
+    "cache_read_input_tokens": 11693,
+    "calls": 2
+   },
+   "latency_s": 4.6,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0089713,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q07",
+   "type": "cannot_answer",
+   "question": "Why did Cobalt Learning withdraw?",
+   "expect": "Data cannot answer: the source records the stage change to withdrawn on 20 Mar 2025 but no reason field exists. Offer next step (task to ask owner).",
+   "answer": "The data doesn't say why Cobalt Learning withdrew. The opportunity history has no reason field for lost or withdrawn deals. I can't tell you the reason, and I won't guess.\n\n**Evidence (sourced, as of 20 Apr 2025), opportunity O006, SC03 Brand Leader LinkedIn, owner Riya Kapoor:**\n- The deal was cash support, proposed at ₹80,000.\n- It moved from prospecting on 15 Feb 2025 to contacted on 17 Feb, proposal sent on 20 Feb and negotiating on 23 Feb.\n- It was confirmed on 25 Feb 2025 at ₹80,000.\n- It was withdrawn on 20 Mar 2025, and the confirmed value went back to ₹0.\n- The brand was marked qualified on 10 Feb 2025 because audience and partnership fit were confirmed in conversation.\n- No installments are recorded for this deal.\n\n**What the data can't show:** who withdrew (the brand or us), the reason, and any related conversation. The withdrawal also came 23 days after confirmation. I'd treat that gap as a fact, not as an explanation.\n\nI can propose a task for Riya Kapoor, the owner, to ask Meera Bhat at Cobalt Learning and record the reason. Should I?",
+   "tools": [
+    {
+     "id": "toolu_01AFKHBVNsipQ82nXwoHuuBt",
+     "name": "get_opportunity_history",
+     "input": {
+      "name": "Cobalt Learning"
+     },
+     "ok": true,
+     "ms": 413,
+     "summary": "name=Cobalt Learning as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 498,
+    "cache_creation_input_tokens": 1243,
+    "cache_read_input_tokens": 11698,
+    "calls": 2
+   },
+   "latency_s": 5,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0092693,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q08",
+   "type": "cannot_answer",
+   "question": "Did Beardo's sponsorship increase festival attendance?",
+   "expect": "Data cannot answer: sponsor_activations only records an association with the Creator Partners attendee campaign and explicitly does not establish incremental visitor impact.",
+   "answer": "The data can't tell us whether Beardo's sponsorship increased attendance. I checked as of 20 Apr 2025.\n\n**Evidence (sourced)**\n- **Activation link:** Beardo's confirmed deal (O001, \"Beardo festival partnership\") is linked to the attendee campaign \"Creator Partners\" (C03). The link was made on 10 Mar 2025 (activation L001). The source note says it \"records an association; it does not establish incremental visitor impact.\"\n- **O001 deal:** It is a cash deal from SC02 Warm Partner Introductions. It was confirmed on 8 Mar 2025 at ₹2,00,000.\n- **O002 deal:** \"Beardo additional sampling activation\" was lost on 3 Apr 2025 at a proposed ₹30,000. It has no activation link.\n- **Missing data:** There is no visitor count per sponsor or per activation. The data also has no baseline or comparison group that would isolate Beardo's effect.\n\n**What I can't say**\n- I can't say how many attendees Beardo brought, or whether any came who wouldn't have come anyway. The data is silent on both.\n- Attendance results for Creator Partners sit in a separate attendee dataset that I can't reach. Even with those results, they would show only how that campaign did overall. They wouldn't show Beardo's share.\n\n**What I can do**\n- I can propose a task to collect Beardo-attributed footfall, for example through a sponsor code, a QR scan or a booth count, for the next edition. Tell me the owner and due date you want.",
+   "tools": [
+    {
+     "id": "toolu_01EgSqZQWowPK8NUhTQjj99F",
+     "name": "data_dictionary",
+     "input": {},
+     "ok": true,
+     "ms": 621,
+     "summary": "no arguments"
+    },
+    {
+     "id": "toolu_018bSRWjVwYZeX1JKCM2HUPr",
+     "name": "get_opportunity_history",
+     "input": {
+      "name": "Beardo"
+     },
+     "ok": true,
+     "ms": 0,
+     "summary": "name=Beardo as of 2025-04-20"
+    },
+    {
+     "id": "toolu_01MzBfqb2yGhUMkgKSrBSskq",
+     "name": "query_data",
+     "input": {
+      "sql": "select * from v_activations where brand_name='Beardo'"
+     },
+     "ok": true,
+     "ms": 1242,
+     "summary": "1 rows: select * from v_activations where brand_name='Beardo'"
+    }
+   ],
+   "usage": {
+    "input_tokens": 8,
+    "output_tokens": 715,
+    "cache_creation_input_tokens": 11252,
+    "cache_read_input_tokens": 28377,
+    "calls": 3
+   },
+   "latency_s": 9.9,
+   "rounds": 3,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0381337,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q09",
+   "type": "calc",
+   "question": "What is the average confirmed deal size for Food and beverage brands?",
+   "expect": "6 confirmed Food and beverage deals, ₹5,50,000 total, average ₹91,667, which includes 2 in kind deals (O005 ₹1,00,000 and O026 ₹60,000). Cash only: 4 deals, ₹3,90,000, average ₹97,500. Must give both or ask which is meant.",
+   "answer": "The average confirmed deal size for Food and beverage brands is about ₹91,667 per deal, counting cash and in kind together. The figures are sourced and as of 20 Apr 2025.\n\nYou didn't say whether to count cash only or cash plus in kind, so here are both:\n\n| Basis | Deals | Value | Average |\n|---|---|---|---|\n| Cash plus in kind | 6 | ₹5,50,000 | ₹91,667 |\n| Cash only | 4 | ₹3,90,000 | ₹97,500 |\n\nThe other 2 confirmed deals are in kind, worth ₹1,60,000 together. In kind value is not cash.\n\nThe deals are counted by opportunity, not by brand.",
+   "tools": [
+    {
+     "id": "toolu_01ATTBNhTpdrH9v3DJpDVuBb",
+     "name": "get_funnel",
+     "input": {
+      "group_by": "industry"
+     },
+     "ok": true,
+     "ms": 477,
+     "summary": "group_by=industry as of 2025-04-20"
+    },
+    {
+     "id": "toolu_01VzRJxsurJ6JMhnyVvmnY7G",
+     "name": "query_data",
+     "input": {
+      "sql": "select o.opportunity_id, o.brand_id, b.industry from v_opportunities o join v_brands b on b.brand_id=o.brand_id limit 3"
+     },
+     "ok": true,
+     "ms": 319,
+     "summary": "3 rows: select o.opportunity_id, o.brand_id, b.industry from v_opportunities o join v_brands b on b.brand_id=o.brand_id limit 3"
+    },
+    {
+     "id": "toolu_01AWE3YVwjeoSHpkDjbMZRR3",
+     "name": "calculate",
+     "input": {
+      "expression": "550000/6"
+     },
+     "ok": true,
+     "ms": 7,
+     "summary": "550000/6 = 91666.6666666667"
+    },
+    {
+     "id": "toolu_01XWj12SotfwpnvAzAw1e4tv",
+     "name": "calculate",
+     "input": {
+      "expression": "390000/4"
+     },
+     "ok": true,
+     "ms": 1,
+     "summary": "390000/4 = 97500"
+    }
+   ],
+   "usage": {
+    "input_tokens": 8,
+    "output_tokens": 483,
+    "cache_creation_input_tokens": 1502,
+    "cache_read_input_tokens": 18818,
+    "calls": 3
+   },
+   "latency_s": 6.5,
+   "rounds": 3,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.010482799999999999,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q10",
+   "type": "calc_caveat",
+   "question": "What is our cost per confirmed partnership by campaign?",
+   "expect": "Budgets/spend are simulated (source has no spend). Cold campaigns have spend but 0 confirmed, so cost per partnership is undefined, not zero. Must caveat.",
+   "answer": "Cost per confirmed partnership by campaign, as of 20 Apr 2025. Budgets and spend are simulated, and so is the cash collected.\n\n| Campaign | Spend to date | Confirmed | Cost per confirmed |\n|---|---|---|---|\n| SC04 Partner Interest Form (warm) | ₹6,000 | 7 | ₹857 |\n| SC02 Warm Partner Introductions (warm) | ₹9,100 | 8 | ₹1,138 |\n| SC05 Creator Network Referrals (warm) | ₹44,000 | 9 | ₹4,889 |\n| SC01 Brand Discovery Email (cold) | ₹30,000 | 0 | undefined |\n| SC03 Brand Leader LinkedIn (cold) | ₹25,100 | 0 | undefined |\n| SC06 Past Conversation Revival (cold) | ₹4,000 | 0 | undefined |\n\n- **Cheapest:** SC04 is the cheapest per partnership. It also has the best simulated cash collected per rupee spent, at about ₹105.8.\n- **Most expensive of the warm campaigns:** SC05 has the most confirmed partnerships, but it costs the most per partnership. It is also ₹4,000 over its ₹40,000 budget. Its simulated cash collected per rupee spent is about ₹14.0.\n- **Cold campaigns:** All three have 0 confirmed as of 20 Apr 2025, so their cost per partnership is undefined, not zero. Together they have spent ₹59,100 with nothing confirmed. Cobalt Learning (SC03) was confirmed on 25 Feb 2025 and withdrawn on 20 Mar 2025, so it doesn't count today.\n- **SC03 overspend:** SC03 is ₹100 over its budget.",
+   "tools": [
+    {
+     "id": "toolu_01E3SbYpDSRBarvZ9ws5DUNq",
+     "name": "get_budgets",
+     "input": {},
+     "ok": true,
+     "ms": 401,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 645,
+    "cache_creation_input_tokens": 1231,
+    "cache_read_input_tokens": 11700,
+    "calls": 2
+   },
+   "latency_s": 6.3,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0107095,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q11",
+   "type": "action",
+   "question": "Create a task for Riya to follow up the three most valuable negotiating deals by 25 April.",
+   "expect": "Proposes one task (owner Riya Kapoor T01, due 2025-04-25) linking 3 negotiating deals, and waits for Confirm before writing. Cedar Pantry (O028, ₹1,10,000) is clearly first. Six deals tie at ₹90,000, so it must flag the tie and either ask or apply the tie break rule, which gives O053 Evergreen Living (last update 6 Feb) and O038 Daybreak Pantry (23 Feb).",
+   "answer": "I've drafted the task for Riya Kapoor, due 25 Apr 2025. It isn't created until you click Confirm on the card.\n\nThe data is as of 20 Apr 2025, and all values are sourced. The top three are:\n1. **O028 Cedar Pantry** (₹1,10,000, Riya's deal)\n2. **O053 Evergreen Living** (₹90,000, Nisha's deal)\n3. **O038 Daybreak Pantry** (₹90,000, Nisha's deal)\n\n**Tie:** Six negotiating deals are tied at ₹90,000. They are O053, O038, O048, O058, O033 and O043. I applied the tie-break rule (value descending, then oldest last update first, then id), which put O053 and O038 in slots 2 and 3. All three deals are stale (stale days = 7, an assumption).\n\nIf you want only Riya's own deals, the top three would be O028, O048 (Evergreen Pantry) and O033 (Cedar Living). Tell me and I'll redo the proposal that way.",
+   "tools": [
+    {
+     "id": "toolu_01BHZTZKRZPYHYGjVjewRVs5",
+     "name": "list_opportunities",
+     "input": {
+      "stage": "negotiating",
+      "limit": 10
+     },
+     "ok": true,
+     "ms": 448,
+     "summary": "8 of 8 opportunities as of 2025-04-20, 1 tie group(s)"
+    },
+    {
+     "id": "toolu_01UkQr8royuqg9nR7L75be3F",
+     "name": "propose_task",
+     "input": {
+      "title": "Follow up top 3 negotiating deals: Cedar Pantry, Evergreen Living, Daybreak Pantry",
+      "owner_id": "T01",
+      "due_date": "2025-04-25",
+      "opportunity_ids": [
+       "O028",
+       "O053",
+       "O038"
+      ],
+      "notes": "O028 Cedar Pantry ₹1,10,000 (SC03, last update 18 Mar 2025); O053 Evergreen Living ₹90,000 (SC06, owner Nisha Rao, last update 6 Feb 2025); O038 Daybreak Pantry ₹90,000 (SC06, owner Nisha Rao, last update 23 Feb 2025). All stale as of 20 Apr 2025."
+     },
+     "ok": true,
+     "ms": 601,
+     "summary": "proposal P-1 pending (awaits Confirm)"
+    }
+   ],
+   "usage": {
+    "input_tokens": 8,
+    "output_tokens": 1109,
+    "cache_creation_input_tokens": 3082,
+    "cache_read_input_tokens": 19503,
+    "calls": 3
+   },
+   "latency_s": 11.3,
+   "rounds": 3,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0207613,
+   "harness_notes": [
+    "Proposals created (pending, not confirmed by the harness): P-1 create_task {\"notes\":\"O028 Cedar Pantry ₹1,10,000 (SC03, last update 18 Mar 2025); O053 Evergreen Living ₹90,000 (SC06, owner Nisha Rao, last update 6 Feb 2025); O038 Daybreak Pantry ₹90,000 (SC06, owner Nisha Rao, last update 23 Feb 2025). All stale as of 20 Apr 2025.\",\"title\":\"Follow up top 3 negotiating deals: Cedar Pantry, Evergreen Living, Daybreak Pantry\",\"brand_id\":null,\"due_date\":\"2025-04-25\",\"owner_id\":\"T01\",\"owner_name\":\"Riya Kapoor\",\"opportunity_ids\":[\"O028\",\"O053\",\"O038\"],\"sponsor_campaign_id\":null}.",
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q12",
+   "type": "calc_caveat",
+   "question": "Which overdue payments should we chase first?",
+   "expect": "Simulated: Bramble Studio balance ₹47,500 due 2025-03-26; Bramble Devices advance ₹55,000 due 2025-03-29; Bramble Devices balance ₹55,000 due 2025-03-29",
+   "answer": "As of 20 Apr 2025, 3 installments are overdue, totalling ₹1,57,500. All of these figures are simulated, because the source has no bank receipts.\n\nSuggested chase order is by amount first, then by days overdue:\n\n| Priority | Brand (opp) | Installment | Amount | Due | Days overdue |\n|---|---|---|---|---|---|\n| 1 | Bramble Devices (O020) | Advance (PAY033) | ₹55,000 | 29 Mar 2025 | 22 |\n| 1 | Bramble Devices (O020) | Balance (PAY034) | ₹55,000 | 29 Mar 2025 | 22 |\n| 3 | Bramble Studio (O019) | Balance (PAY032) | ₹47,500 | 26 Mar 2025 | 25 |\n\n- **Bramble Devices:** Chase this brand first. It owes ₹1,10,000 across two installments, and nothing has been paid on O020. The two installments tie on amount and due date, so I'd raise them in a single conversation.\n- **Bramble Studio:** This is a separate brand from Bramble Devices. Its balance of ₹47,500 is the smallest amount but the longest overdue, at 25 days. Chase it in parallel.\n\nBoth deals are still at partner_confirmed, and no installments carry flags. The data doesn't show contact attempts or the reason for non-payment. I can propose chase tasks for the owners if you'd like.",
+   "tools": [
+    {
+     "id": "toolu_019bGo3SFLUqicmDybpthDbY",
+     "name": "get_collections",
+     "input": {
+      "status": "overdue"
+     },
+     "ok": true,
+     "ms": 407,
+     "summary": "status=overdue as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 538,
+    "cache_creation_input_tokens": 980,
+    "cache_read_input_tokens": 11695,
+    "calls": 2
+   },
+   "latency_s": 6.8,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0090115,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q13",
+   "type": "cannot_answer",
+   "question": "What will our sponsorship revenue be next year?",
+   "expect": "Cannot forecast next year from this data; can show current weighted pipeline (assumption based stage weights) and point to strategy assumptions. Must not invent.",
+   "answer": "I can't forecast next year's revenue from this data. The data has no field for next-edition revenue, and I won't guess a causal forecast. It does give a baseline and one planning figure.\n\n**Baseline (CampusFest 2025, as of 20 Apr 2025)**\n- Confirmed value: ₹22,40,000 total. That is ₹20,00,000 cash and ₹2,40,000 in kind (sourced). In-kind value is not cash.\n- Cash collected before the festival: ₹17,90,000 (simulated).\n- Cash collected in total: ₹18,42,500 (simulated). ₹1,57,500 is outstanding and overdue across 3 installments (simulated).\n- Open pipeline: ₹14,40,000 proposed. The weighted value is ₹6,27,000 (assumption, from stage weights). All 26 open deals are stale at the 7-day threshold.\n- Partnerships: 24 confirmed against a goal of 28 (revised plan).\n\n**Planning figure**\n- The team's next-edition base-case cash goal is ₹24,46,000 (assumption set in Settings). This is a target, not a prediction.\n- Cash collected before the festival fell ₹6,56,000 short of that goal.\n\n**What the data can't tell us**\n- It has no information on the Bengaluru edition's scale, pricing, sponsor renewals, or market conditions.\n- It has no 2026 history to project a trend from.\n\nI can build scenarios from this baseline. For example, I could show what win rate or deal count would reach ₹24,46,000 in cash. I could also propose a task for the team to set renewal and pricing assumptions. Would you like either?",
+   "tools": [
+    {
+     "id": "toolu_01S8TDyaJUR4AnSWzGMEXC7p",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 393,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 657,
+    "cache_creation_input_tokens": 1934,
+    "cache_read_input_tokens": 11697,
+    "calls": 2
+   },
+   "latency_s": 7.4,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.012586700000000001,
+   "harness_notes": [
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  },
+  {
+   "id": "Q14",
+   "type": "changed_data",
+   "question": "How many confirmed partnerships now?",
+   "expect": "Reflects the edit immediately (e.g. 25), stamped at the simulation date, and earlier snapshots unchanged.",
+   "answer": "**There are 25 confirmed partnerships as of 20 Apr 2025.** These are sourced figures, counted by opportunity. They span 25 brands.\n\n- The goal under the Sponsor revised plan (in force since 15 Mar 2025) is 28, so the team is 3 short.\n- Confirmed value is ₹23,50,000 in total. Of that, ₹21,10,000 is cash and ₹2,40,000 is in kind.\n- The count includes one edit made in the app. Cedar Pantry (O028) was set to partner_confirmed on 20 Apr 2025, at ₹1,10,000.",
+   "tools": [
+    {
+     "id": "toolu_016PL6T5qkvUN8VyejYa8oCo",
+     "name": "get_overview",
+     "input": {},
+     "ok": true,
+     "ms": 398,
+     "summary": "no arguments as of 2025-04-20"
+    }
+   ],
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 232,
+    "cache_creation_input_tokens": 1955,
+    "cache_read_input_tokens": 11694,
+    "calls": 2
+   },
+   "latency_s": 4.1,
+   "rounds": 2,
+   "stop_reason": "end_turn",
+   "cost_usd": 0.0083889,
+   "harness_notes": [
+    "Before asking: O028 Cedar Pantry set to partner_confirmed through lib/writes (APP-OH-1, effective 2025-04-20T02:42:37.391Z), as the UI edit would.",
+    "Writes by the copilot during this question: tasks 0, audit rows 0."
+   ]
+  }
+ ]
+}
